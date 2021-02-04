@@ -24,6 +24,7 @@ namespace ShiftsApi
             {
                 Response.End();
             }
+
         }
     }
 }

@@ -53,7 +53,7 @@
     <Compile Include="Business.cs">
       <DependentUpon>ShiftsDB.tt</DependentUpon>
     </Compile>
-    <Compile Include="Class1.cs" />
+    <Compile Include="ConnectDB.cs" />
     <Compile Include="Constraints.cs">
       <DependentUpon>ShiftsDB.tt</DependentUpon>
     </Compile>
