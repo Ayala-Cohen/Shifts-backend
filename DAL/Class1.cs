@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace DAL
 {
-    public class Class1
+    public class ConnectDB
     {
+        static ShiftsEntities entity = new ShiftsEntities();
     }
 }

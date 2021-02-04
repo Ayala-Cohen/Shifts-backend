@@ -13,5 +13,17 @@ namespace ShiftsApi
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
         }
+        protected void Application_BeginRequest()
+        {
+            Response.AddHeader("Access-Control-Allow-Origin", "*");
+            Response.AddHeader("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+            Response.AddHeader("Access-Control-Allow-Headers", "Content-Type, Accept, Pragma, Cache-Control, Authorization ");
+
+            if (Request.Headers.AllKeys.Contains("Origin", StringComparer.CurrentCultureIgnoreCase)
+                && Request.HttpMethod == "OPTIONS")
+            {
+                Response.End();
+            }
+        }
     }
 }
