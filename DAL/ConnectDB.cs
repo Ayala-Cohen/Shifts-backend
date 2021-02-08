@@ -8,6 +8,6 @@ namespace DAL
 {
     public class ConnectDB
     {
-        static ShiftsEntities entity = new ShiftsEntities();
+        public static ShiftsEntities entity = new ShiftsEntities();
     }
 }

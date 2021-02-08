@@ -85,6 +85,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Compile Include="Controllers\BusinessController.cs" />
+    <Compile Include="Controllers\ConstraintsController.cs" />
+    <Compile Include="Controllers\DepartmentsController.cs" />
+    <Compile Include="Controllers\EmployeesController.cs" />
+    <Compile Include="Controllers\Employees_RoleController.cs" />
+    <Compile Include="Controllers\RatingController.cs" />
+    <Compile Include="Controllers\ShiftsController.cs" />
+    <Compile Include="Controllers\Shifts_EmployeesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -101,7 +109,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Controllers\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <PropertyGroup>
