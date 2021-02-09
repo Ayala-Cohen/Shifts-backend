@@ -11,7 +11,7 @@
         <EntityTypeShape EntityType="ShiftsModel.Employee_Roles" Width="1.5" PointX="3" PointY="6.25" IsExpanded="true" />
         <EntityTypeShape EntityType="ShiftsModel.Employees" Width="1.5" PointX="12" PointY="4.875" IsExpanded="true" />
         <EntityTypeShape EntityType="ShiftsModel.Rating" Width="1.5" PointX="9.75" PointY="7.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.Shift_Employees" Width="1.5" PointX="5.25" PointY="4.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Shift_Employees" Width="1.5" PointX="5.25" PointY="3.875" IsExpanded="true" />
         <EntityTypeShape EntityType="ShiftsModel.Shifts" Width="1.5" PointX="7.5" PointY="4.625" IsExpanded="true" />
         <EntityTypeShape EntityType="ShiftsModel.sysdiagrams" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
         <AssociationConnector Association="ShiftsModel.FK_Departments_Business" ManuallyRouted="false" />
