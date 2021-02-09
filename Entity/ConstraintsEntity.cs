@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using DAL;
 namespace Entity
 {
-    class ConstraintsEntity
+    public class ConstraintsEntity
     {
         public string Employee_Id { get; set; }
         public int Shift_Id { get; set; }
         public string Day { get; set; }
 
 
-        //המרת קטגוריה בודדת מסוג המסד לסוג המחלקה
+        //המרת אילוץ מסוג המסד לסוג המחלקה
 
         public static ConstraintsEntity ConvertDBToEntity(Constraints c)
         {
@@ -21,7 +21,7 @@ namespace Entity
         }
 
 
-        //המרת קטגוריה בודדת מסוג המחלקה לסוג המסד
+        //המרת אילוץ מסוג המחלקה לסוג המסד
         public static Constraints  ConvertEntityToDB(ConstraintsEntity c)
         {
             return new Constraints () { Employee_Id = c.Employee_Id, Shift_Id = c.Shift_Id, Day = c.Day }; 

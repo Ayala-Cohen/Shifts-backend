@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 using DAL;
 namespace Entity
 {
-    class ShiftsEntity
+    public class ShiftsEntity
     {
         public int ID { get; set; }
         public int Business_Id { get; set; }
         public string Name { get; set; }
 
-        //המרת קטגוריה בודדת מסוג המחלקה לסוג המסד
+        //המרת משמרת בודדת מסוג המסד לסוג המחלקה
         public static ShiftsEntity ConvertDBToEntity(Shifts s)
         {
             return new ShiftsEntity() { ID =s.ID , Business_Id = s.Business_Id, Name= s.Name };
         }
 
-        //המרת קטגוריה בודדת מסוג המחלקה לסוג המסד
-        public static Shifts ConvertDBToEntity(ShiftsEntity s)
+        //המרת משמרת בודדת מסוג המחלקה לסוג המסד
+        public static Shifts ConvertEntityToDB(ShiftsEntity s)
         {
             return new Shifts() { ID = s.ID, Business_Id = s.Business_Id, Name = s.Name };
         }
@@ -36,13 +36,13 @@ namespace Entity
             return s_Shifts;
         }
 
-        //המרת רשימה מסוג המסד לרשימה מסוג המחלקה
-        public static List<Shifts> ConvertListDBToListEntity(List<ShiftsEntity> l)
+        //המרת רשימה מסוג המחלקה לרשימה מסוג המסד
+        public static List<Shifts> ConvertListEntityToListDB(List<ShiftsEntity> l)
         {
             List<Shifts> s_Shifts = new List<Shifts>();
             foreach (var item in l)
             {
-                s_Shifts.Add(ConvertDBToEntity(item));
+                s_Shifts.Add(ConvertEntityToDB(item));
             }
             return s_Shifts;
         }

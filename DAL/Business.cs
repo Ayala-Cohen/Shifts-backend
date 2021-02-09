@@ -28,7 +28,7 @@ namespace DAL
         public string Name { get; set; }
         public byte[] Logo { get; set; }
         public string User_Name { get; set; }
-        public int Password { get; set; }
+        public string Password { get; set; }
         public string Full_Name { get; set; }
         public int Number { get; set; }
     

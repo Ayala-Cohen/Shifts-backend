@@ -6,26 +6,23 @@ using System.Threading.Tasks;
 using DAL;
 namespace Entity
 {
-    class RatingEntity
+    public class RatingEntity
     {
         public string Employee_ID { get; set; }
         public System.DateTime Rating_Start_Date { get; set; }
-        public Nullable<System.DateTime> Rating_End_Date { get; set; }
+        public System.DateTime Rating_End_Date { get; set; }
         public string Rating1 { get; set; }
         public string Day { get; set; }
         public int Shift_Id { get; set; }
         public bool Shift_Approved { get; set; }
 
-        //public virtual Employees Employees { get; set; }
-        //public virtual Shifts Shifts { get; set; }
-
-        //המרת קטגוריה בודדת מסוג המחלקה לסוג המסד
-        public static RatingEntity ConvertDBToEntity(Rating  r)
+        //המרת דירוג מסוג המסד לסוג המחלקה
+        public static RatingEntity ConvertDBToEntity(Rating r)
         {
             return new RatingEntity () {Employee_ID =r.Employee_ID , Rating_Start_Date=r.Rating_Start_Date , Rating_End_Date =r.Rating_End_Date , Rating1=r.Rating1 , Day=r.Day , Shift_Id=r.Shift_Id , Shift_Approved =r.Shift_Approved };
         }
 
-        //המרת קטגוריה בודדת מסוג המחלקה לסוג המסד
+        //המרת דירוג מסוג המחלקה לסוג המסד
         public static Rating ConvertEntityToDB(RatingEntity r)
         {
             return new Rating() { Employee_ID = r.Employee_ID, Rating_Start_Date = r.Rating_Start_Date, Rating_End_Date = r.Rating_End_Date, Rating1 = r.Rating1, Day = r.Day, Shift_Id = r.Shift_Id, Shift_Approved = r.Shift_Approved };
@@ -43,8 +40,7 @@ namespace Entity
             }
             return r_ratings;
         }
-
-        //המרת רשימה מסוג המסד לרשימה מסוג המחלקה
+        //המרת רשימה מסוג המחלקה לרשימה מסוג המסד
         public static List<Rating> ConvertListEntityToListDB(List<RatingEntity >l)
         {
             List<Rating> r_ratings = new List<Rating>();

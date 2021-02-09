@@ -7,27 +7,27 @@ using DAL;
 
 namespace Entity
 {
-    class BusinessEntity
+    public class BusinessEntity
     {
 
         public int ID { get; set; }
         public string Name { get; set; }
         public byte[] Logo { get; set; }
         public string User_Name { get; set; }
-        public int Password { get; set; }
+        public string Password { get; set; }
         public string Full_Name { get; set; }
         public int Number { get; set; }
 
 
-        //המרת קטגוריה בודדת מסוג המסד לסוג המחלקה
+        //המרת עסק בודד מסוג המסד לסוג המחלקה
 
         public static BusinessEntity ConvertDBToEntity(Business b)
         {
             return new BusinessEntity() { ID = b.ID, Name = b.Name, Logo = b.Logo, User_Name = b.User_Name, Password = b.Password, Full_Name = b.Full_Name, Number = b.Number };
         }
-         
 
-        //המרת קטגוריה בודדת מסוג המחלקה לסוג המסד
+
+        //המרת עסק בודד מסוג המחלקה לסוג המסד
         public static Business ConvertEntityToDB(BusinessEntity b)
         {
             return new Business () { ID = b.ID, Name = b.Name, Logo = b.Logo, User_Name = b.User_Name, Password = b.Password, Full_Name = b.Full_Name, Number = b.Number };
@@ -44,7 +44,7 @@ namespace Entity
             return b_business;
         }
 
-        //המרת רשימה מסוג המסד לרשימה מסוג המחלקה
+        //המרת רשימה מסוג המחלקה לרשימה מסוג המסד
         public static List<Business> ConvertListEntityToListDB(List<BusinessEntity> l)
         {
             List<Business > b_business = new List<Business >();

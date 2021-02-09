@@ -16,7 +16,7 @@ namespace DAL
     {
         public string Employee_ID { get; set; }
         public System.DateTime Rating_Start_Date { get; set; }
-        public Nullable<System.DateTime> Rating_End_Date { get; set; }
+        public System.DateTime Rating_End_Date { get; set; }
         public string Rating1 { get; set; }
         public string Day { get; set; }
         public int Shift_Id { get; set; }

@@ -13,7 +13,7 @@
           <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Logo" Type="image" />
           <Property Name="User_Name" Type="varchar" MaxLength="50" Nullable="false" />
-          <Property Name="Password" Type="int" Nullable="false" />
+          <Property Name="Password" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Full_Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Number" Type="int" Nullable="false" />
         </EntityType>
@@ -51,8 +51,8 @@
           </Key>
           <Property Name="ID" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="password" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="Role_id" Type="int" Nullable="false" />
+          <Property Name="Password" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Role_Id" Type="int" Nullable="false" />
           <Property Name="Email" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Business_Id" Type="int" Nullable="false" />
         </EntityType>
@@ -70,7 +70,7 @@
           </Key>
           <Property Name="Employee_ID" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Rating_Start_Date" Type="date" Nullable="false" />
-          <Property Name="Rating_End_Date" Type="date" />
+          <Property Name="Rating_End_Date" Type="date" Nullable="false" />
           <Property Name="Rating" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Day" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Shift_Id" Type="int" Nullable="false" />
@@ -148,19 +148,19 @@
               <PropertyRef Name="ID" />
             </Principal>
             <Dependent Role="Employees">
-              <PropertyRef Name="Role_id" />
+              <PropertyRef Name="Role_Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Employees_Rating">
-          <End Role="Rating" Type="Self.Rating" Multiplicity="1" />
-          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+        <Association Name="FK_Rating_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="1" />
+          <End Role="Rating" Type="Self.Rating" Multiplicity="0..1" />
           <ReferentialConstraint>
-            <Principal Role="Rating">
-              <PropertyRef Name="Employee_ID" />
-            </Principal>
-            <Dependent Role="Employees">
+            <Principal Role="Employees">
               <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Rating">
+              <PropertyRef Name="Employee_ID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -176,6 +176,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Shift_Employees_Shifts">
+          <End Role="Shifts" Type="Self.Shifts" Multiplicity="1" />
+          <End Role="Shift_Employees" Type="Self.Shift_Employees" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="Shifts">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Shift_Employees">
+              <PropertyRef Name="Shift_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Shifts_Business">
           <End Role="Business" Type="Self.Business" Multiplicity="1" />
           <End Role="Shifts" Type="Self.Shifts" Multiplicity="*" />
@@ -185,18 +197,6 @@
             </Principal>
             <Dependent Role="Shifts">
               <PropertyRef Name="Business_Id" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Shifts_Shift_Employees1">
-          <End Role="Shift_Employees" Type="Self.Shift_Employees" Multiplicity="1" />
-          <End Role="Shifts" Type="Self.Shifts" Multiplicity="0..1" />
-          <ReferentialConstraint>
-            <Principal Role="Shift_Employees">
-              <PropertyRef Name="Shift_ID" />
-            </Principal>
-            <Dependent Role="Shifts">
-              <PropertyRef Name="ID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -236,7 +236,7 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Table_Rating_Table_Shift">
+        <Association Name="FK_Table_Rating_Table_Shifts">
           <End Role="Shifts" Type="Self.Shifts" Multiplicity="1" />
           <End Role="Rating" Type="Self.Rating" Multiplicity="*" />
           <ReferentialConstraint>
@@ -311,20 +311,20 @@
             <End Role="Employee_Roles" EntitySet="Employee_Roles" />
             <End Role="Employees" EntitySet="Employees" />
           </AssociationSet>
-          <AssociationSet Name="FK_Employees_Rating" Association="Self.FK_Employees_Rating">
-            <End Role="Rating" EntitySet="Rating" />
+          <AssociationSet Name="FK_Rating_Employees" Association="Self.FK_Rating_Employees">
             <End Role="Employees" EntitySet="Employees" />
+            <End Role="Rating" EntitySet="Rating" />
           </AssociationSet>
           <AssociationSet Name="FK_Shift_Employees_Employee_Roles" Association="Self.FK_Shift_Employees_Employee_Roles">
             <End Role="Employee_Roles" EntitySet="Employee_Roles" />
             <End Role="Shift_Employees" EntitySet="Shift_Employees" />
           </AssociationSet>
+          <AssociationSet Name="FK_Shift_Employees_Shifts" Association="Self.FK_Shift_Employees_Shifts">
+            <End Role="Shifts" EntitySet="Shifts" />
+            <End Role="Shift_Employees" EntitySet="Shift_Employees" />
+          </AssociationSet>
           <AssociationSet Name="FK_Shifts_Business" Association="Self.FK_Shifts_Business">
             <End Role="Business" EntitySet="Business" />
-            <End Role="Shifts" EntitySet="Shifts" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Shifts_Shift_Employees1" Association="Self.FK_Shifts_Shift_Employees1">
-            <End Role="Shift_Employees" EntitySet="Shift_Employees" />
             <End Role="Shifts" EntitySet="Shifts" />
           </AssociationSet>
           <AssociationSet Name="FK_Table_Employee_Roles_Business" Association="Self.FK_Table_Employee_Roles_Business">
@@ -339,7 +339,7 @@
             <End Role="Employees" EntitySet="Employees" />
             <End Role="Employees_Departments" EntitySet="Employees_Departments" />
           </AssociationSet>
-          <AssociationSet Name="FK_Table_Rating_Table_Shift" Association="Self.FK_Table_Rating_Table_Shift">
+          <AssociationSet Name="FK_Table_Rating_Table_Shifts" Association="Self.FK_Table_Rating_Table_Shifts">
             <End Role="Shifts" EntitySet="Shifts" />
             <End Role="Rating" EntitySet="Rating" />
           </AssociationSet>
@@ -369,7 +369,7 @@
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Logo" Type="Binary" MaxLength="Max" FixedLength="false" />
           <Property Name="User_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Password" Type="Int32" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Full_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Number" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Departments" Relationship="Self.FK_Departments_Business" FromRole="Business" ToRole="Departments" />
@@ -420,14 +420,14 @@
           </Key>
           <Property Name="ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Role_id" Type="Int32" Nullable="false" />
+          <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Role_Id" Type="Int32" Nullable="false" />
           <Property Name="Email" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Business_Id" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Business" Relationship="Self.FK_Table_Workers_Business" FromRole="Employees" ToRole="Business" />
           <NavigationProperty Name="Constraints" Relationship="Self.FK_Constraints_Employees" FromRole="Employees" ToRole="Constraints" />
           <NavigationProperty Name="Employee_Roles" Relationship="Self.FK_Employees_Employee_Roles" FromRole="Employees" ToRole="Employee_Roles" />
-          <NavigationProperty Name="Rating" Relationship="Self.FK_Employees_Rating" FromRole="Employees" ToRole="Rating" />
+          <NavigationProperty Name="Rating" Relationship="Self.FK_Rating_Employees" FromRole="Employees" ToRole="Rating" />
           <NavigationProperty Name="Departments" Relationship="Self.Employees_Departments" FromRole="Employees" ToRole="Departments" />
         </EntityType>
         <EntityType Name="Rating">
@@ -436,13 +436,13 @@
           </Key>
           <Property Name="Employee_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Rating_Start_Date" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="Rating_End_Date" Type="DateTime" Precision="0" />
+          <Property Name="Rating_End_Date" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="Rating1" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Day" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Shift_Id" Type="Int32" Nullable="false" />
           <Property Name="Shift_Approved" Type="Boolean" Nullable="false" />
-          <NavigationProperty Name="Employees" Relationship="Self.FK_Employees_Rating" FromRole="Rating" ToRole="Employees" />
-          <NavigationProperty Name="Shifts" Relationship="Self.FK_Table_Rating_Table_Shift" FromRole="Rating" ToRole="Shifts" />
+          <NavigationProperty Name="Employees" Relationship="Self.FK_Rating_Employees" FromRole="Rating" ToRole="Employees" />
+          <NavigationProperty Name="Shifts" Relationship="Self.FK_Table_Rating_Table_Shifts" FromRole="Rating" ToRole="Shifts" />
         </EntityType>
         <EntityType Name="Shift_Employees">
           <Key>
@@ -456,7 +456,7 @@
           <NavigationProperty Name="Business" Relationship="Self.FK_Table_Shift_Workers_Business" FromRole="Shift_Employees" ToRole="Business" />
           <NavigationProperty Name="Departments" Relationship="Self.FK_Table_Shift_Workers_Table_Departments" FromRole="Shift_Employees" ToRole="Departments" />
           <NavigationProperty Name="Employee_Roles" Relationship="Self.FK_Shift_Employees_Employee_Roles" FromRole="Shift_Employees" ToRole="Employee_Roles" />
-          <NavigationProperty Name="Shifts" Relationship="Self.FK_Shifts_Shift_Employees1" FromRole="Shift_Employees" ToRole="Shifts" />
+          <NavigationProperty Name="Shifts" Relationship="Self.FK_Shift_Employees_Shifts" FromRole="Shift_Employees" ToRole="Shifts" />
         </EntityType>
         <EntityType Name="Shifts">
           <Key>
@@ -467,8 +467,8 @@
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Business" Relationship="Self.FK_Shifts_Business" FromRole="Shifts" ToRole="Business" />
           <NavigationProperty Name="Constraints" Relationship="Self.FK_Constraints_Shifts" FromRole="Shifts" ToRole="Constraints" />
-          <NavigationProperty Name="Rating" Relationship="Self.FK_Table_Rating_Table_Shift" FromRole="Shifts" ToRole="Rating" />
-          <NavigationProperty Name="Shift_Employees" Relationship="Self.FK_Shifts_Shift_Employees1" FromRole="Shifts" ToRole="Shift_Employees" />
+          <NavigationProperty Name="Rating" Relationship="Self.FK_Table_Rating_Table_Shifts" FromRole="Shifts" ToRole="Rating" />
+          <NavigationProperty Name="Shift_Employees" Relationship="Self.FK_Shift_Employees_Shifts" FromRole="Shifts" ToRole="Shift_Employees" />
         </EntityType>
         <EntityType Name="sysdiagrams">
           <Key>
@@ -584,7 +584,7 @@
               <PropertyRef Name="ID" />
             </Principal>
             <Dependent Role="Employees">
-              <PropertyRef Name="Role_id" />
+              <PropertyRef Name="Role_Id" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -600,19 +600,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Employees_Rating">
-          <End Role="Rating" Type="Self.Rating" Multiplicity="1" />
-          <End Role="Employees" Type="Self.Employees" Multiplicity="0..1" />
+        <Association Name="FK_Rating_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="1" />
+          <End Role="Rating" Type="Self.Rating" Multiplicity="0..1" />
           <ReferentialConstraint>
-            <Principal Role="Rating">
-              <PropertyRef Name="Employee_ID" />
-            </Principal>
-            <Dependent Role="Employees">
+            <Principal Role="Employees">
               <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Rating">
+              <PropertyRef Name="Employee_ID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Table_Rating_Table_Shift">
+        <Association Name="FK_Table_Rating_Table_Shifts">
           <End Role="Shifts" Type="Self.Shifts" Multiplicity="1" />
           <End Role="Rating" Type="Self.Rating" Multiplicity="*" />
           <ReferentialConstraint>
@@ -624,15 +624,15 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <Association Name="FK_Shifts_Shift_Employees1">
-          <End Role="Shift_Employees" Type="Self.Shift_Employees" Multiplicity="1" />
-          <End Role="Shifts" Type="Self.Shifts" Multiplicity="0..1" />
+        <Association Name="FK_Shift_Employees_Shifts">
+          <End Role="Shifts" Type="Self.Shifts" Multiplicity="1" />
+          <End Role="Shift_Employees" Type="Self.Shift_Employees" Multiplicity="0..1" />
           <ReferentialConstraint>
-            <Principal Role="Shift_Employees">
-              <PropertyRef Name="Shift_ID" />
-            </Principal>
-            <Dependent Role="Shifts">
+            <Principal Role="Shifts">
               <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Shift_Employees">
+              <PropertyRef Name="Shift_ID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -690,17 +690,17 @@
             <End Role="Employee_Roles" EntitySet="Employee_Roles" />
             <End Role="Shift_Employees" EntitySet="Shift_Employees" />
           </AssociationSet>
-          <AssociationSet Name="FK_Employees_Rating" Association="Self.FK_Employees_Rating">
-            <End Role="Rating" EntitySet="Rating" />
+          <AssociationSet Name="FK_Rating_Employees" Association="Self.FK_Rating_Employees">
             <End Role="Employees" EntitySet="Employees" />
+            <End Role="Rating" EntitySet="Rating" />
           </AssociationSet>
-          <AssociationSet Name="FK_Table_Rating_Table_Shift" Association="Self.FK_Table_Rating_Table_Shift">
+          <AssociationSet Name="FK_Table_Rating_Table_Shifts" Association="Self.FK_Table_Rating_Table_Shifts">
             <End Role="Shifts" EntitySet="Shifts" />
             <End Role="Rating" EntitySet="Rating" />
           </AssociationSet>
-          <AssociationSet Name="FK_Shifts_Shift_Employees1" Association="Self.FK_Shifts_Shift_Employees1">
-            <End Role="Shift_Employees" EntitySet="Shift_Employees" />
+          <AssociationSet Name="FK_Shift_Employees_Shifts" Association="Self.FK_Shift_Employees_Shifts">
             <End Role="Shifts" EntitySet="Shifts" />
+            <End Role="Shift_Employees" EntitySet="Shift_Employees" />
           </AssociationSet>
           <AssociationSet Name="Employees_Departments" Association="Self.Employees_Departments">
             <End Role="Departments" EntitySet="Departments" />
@@ -761,8 +761,8 @@
               <MappingFragment StoreEntitySet="Employees">
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
-                <ScalarProperty Name="password" ColumnName="password" />
-                <ScalarProperty Name="Role_id" ColumnName="Role_id" />
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Role_Id" ColumnName="Role_Id" />
                 <ScalarProperty Name="Email" ColumnName="Email" />
                 <ScalarProperty Name="Business_Id" ColumnName="Business_Id" />
               </MappingFragment>

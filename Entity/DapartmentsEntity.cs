@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using DAL;
 namespace Entity
 {
-    class DepartmentsEntity
+    public class DepartmentsEntity
     {
         public int ID { get; set; }
         public string Name { get; set; }
@@ -15,7 +15,7 @@ namespace Entity
         public System.DateTime Diary_Closing_Day { get; set; }
 
 
-        //המרת קטגוריה בודדת מסוג המחלקה לסוג המסד
+        //המרת מחלקה בודדת מסוג המסד לסוג המחלקה
         public static DepartmentsEntity ConvertDBToEntity(Departments d)
         {
             return new DepartmentsEntity() { ID = d.ID, Name = d.Name, Business_Id = d.Business_Id, Diary_Opening_Day = d.Diary_Opening_Day, Diary_Closing_Day = d.Diary_Closing_Day };
@@ -39,7 +39,7 @@ namespace Entity
             return d_departments ;
         }
 
-        //המרת רשימה מסוג המסד לרשימה מסוג המחלקה
+        //המרת רשימה מסוג המחלקה לרשימה מסוג המסד
         public static List<Departments > ConvertListEntityToListDB(List<DepartmentsEntity> l)
         {
             List<Departments> d_departments = new List<Departments >();
