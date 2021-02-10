@@ -35,13 +35,13 @@ namespace BL
         //פונקציה לעדכון עסק
         public static List<BusinessEntity> UpdateBusiness(BusinessEntity b)
         {
-            Business business_for_updating = ConnectDB.entity.Business.First(x => x.ID == b.ID);
-            business_for_updating.Full_Name = b.Full_Name;
-            business_for_updating.Logo = b.Logo;
-            business_for_updating.Name = b.Name;
-            business_for_updating.Number = b.Number;
-            business_for_updating.Password = b.Password;
-            business_for_updating.User_Name = b.User_Name;
+            Business business_for_updating = ConnectDB.entity.Business.First(x => x.ID == b.id);
+            business_for_updating.Full_Name = b.full_name;
+            business_for_updating.Logo = b.logo;
+            business_for_updating.Name = b.name;
+            business_for_updating.Number = b.number;
+            business_for_updating.Password = b.password;
+            business_for_updating.User_Name = b.user_name;
             ConnectDB.entity.SaveChanges();
             return BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
         }

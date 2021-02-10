@@ -34,8 +34,8 @@ namespace BL
         //פונקציה לעדכון משמרת
         public static List<ShiftsEntity> UpdateShift(ShiftsEntity s)
         {
-            Shifts shift_for_updating = ConnectDB.entity.Shifts.First(x => x.ID == s.ID);
-            shift_for_updating.Name = s.Name;
+            Shifts shift_for_updating = ConnectDB.entity.Shifts.First(x => x.ID == s.id);
+            shift_for_updating.Name = s.name;
             ConnectDB.entity.SaveChanges();
             return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.ToList());
         }

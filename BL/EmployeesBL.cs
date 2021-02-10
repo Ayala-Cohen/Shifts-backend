@@ -34,12 +34,12 @@ namespace BL
         //פונקציה לעדכון עובד
         public static List<EmployeesEntity> UpdateEmployee(EmployeesEntity e)
         {
-            Employees employee_for_updating = ConnectDB.entity.Employees.First(x => x.ID == e.ID);
-            employee_for_updating.Email = e.Email;
-            employee_for_updating.Name = e.Name;
+            Employees employee_for_updating = ConnectDB.entity.Employees.First(x => x.ID == e.id);
+            employee_for_updating.Email = e.email;
+            employee_for_updating.Name = e.name;
             employee_for_updating.Password = e.password;
-            employee_for_updating.Role_Id = e.Role_id;
-            employee_for_updating.Business_Id = e.Business_Id;
+            employee_for_updating.Role_Id = e.role_id;
+            employee_for_updating.Business_Id = e.business_id;
             ConnectDB.entity.SaveChanges();
             return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.ToList());
         }

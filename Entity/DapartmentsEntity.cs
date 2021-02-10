@@ -8,23 +8,23 @@ namespace Entity
 {
     public class DepartmentsEntity
     {
-        public int ID { get; set; }
-        public string Name { get; set; }
-        public int Business_Id { get; set; }
-        public System.DateTime Diary_Opening_Day { get; set; }
-        public System.DateTime Diary_Closing_Day { get; set; }
+        public int id { get; set; }
+        public string name { get; set; }
+        public int business_id { get; set; }
+        public System.DateTime diary_opening_day { get; set; }
+        public System.DateTime diary_closing_day { get; set; }
 
 
         //המרת מחלקה בודדת מסוג המסד לסוג המחלקה
         public static DepartmentsEntity ConvertDBToEntity(Departments d)
         {
-            return new DepartmentsEntity() { ID = d.ID, Name = d.Name, Business_Id = d.Business_Id, Diary_Opening_Day = d.Diary_Opening_Day, Diary_Closing_Day = d.Diary_Closing_Day };
+            return new DepartmentsEntity() { id = d.ID, name = d.Name, business_id = d.Business_Id, diary_opening_day = d.Diary_Opening_Day, diary_closing_day = d.Diary_Closing_Day };
         }
 
         //המרת קטגוריה בודדת מסוג המחלקה לסוג המסד
         public static Departments ConvertEntityToDB (DepartmentsEntity d)
         {
-            return new  Departments () { ID = d.ID, Name = d.Name, Business_Id = d.Business_Id, Diary_Opening_Day = d.Diary_Opening_Day, Diary_Closing_Day = d.Diary_Closing_Day };
+            return new  Departments () { ID = d.id, Name = d.name, Business_Id = d.business_id, Diary_Opening_Day = d.diary_opening_day, Diary_Closing_Day = d.diary_closing_day };
         }
 
 

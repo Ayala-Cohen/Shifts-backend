@@ -10,27 +10,27 @@ namespace Entity
     public class BusinessEntity
     {
 
-        public int ID { get; set; }
-        public string Name { get; set; }
-        public byte[] Logo { get; set; }
-        public string User_Name { get; set; }
-        public string Password { get; set; }
-        public string Full_Name { get; set; }
-        public int Number { get; set; }
+        public int id { get; set; }
+        public string name { get; set; }
+        public byte[] logo { get; set; }
+        public string user_name { get; set; }
+        public string password { get; set; }
+        public string full_name { get; set; }
+        public int number { get; set; }
 
 
         //המרת עסק בודד מסוג המסד לסוג המחלקה
 
         public static BusinessEntity ConvertDBToEntity(Business b)
         {
-            return new BusinessEntity() { ID = b.ID, Name = b.Name, Logo = b.Logo, User_Name = b.User_Name, Password = b.Password, Full_Name = b.Full_Name, Number = b.Number };
+            return new BusinessEntity() { id = b.ID, name = b.Name, logo = b.Logo, user_name = b.User_Name, password = b.Password, full_name = b.Full_Name, number = b.Number };
         }
 
 
         //המרת עסק בודד מסוג המחלקה לסוג המסד
         public static Business ConvertEntityToDB(BusinessEntity b)
         {
-            return new Business () { ID = b.ID, Name = b.Name, Logo = b.Logo, User_Name = b.User_Name, Password = b.Password, Full_Name = b.Full_Name, Number = b.Number };
+            return new Business () { ID = b.id, Name = b.name, Logo = b.logo, User_Name = b.user_name, Password = b.password, Full_Name = b.full_name, Number = b.number };
         }
 
         //המרת רשימה מסוג המסד לרשימה מסוג המחלקה

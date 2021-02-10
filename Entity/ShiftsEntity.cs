@@ -8,20 +8,20 @@ namespace Entity
 {
     public class ShiftsEntity
     {
-        public int ID { get; set; }
-        public int Business_Id { get; set; }
-        public string Name { get; set; }
+        public int id { get; set; }
+        public int business_id { get; set; }
+        public string name { get; set; }
 
         //המרת משמרת בודדת מסוג המסד לסוג המחלקה
         public static ShiftsEntity ConvertDBToEntity(Shifts s)
         {
-            return new ShiftsEntity() { ID =s.ID , Business_Id = s.Business_Id, Name= s.Name };
+            return new ShiftsEntity() { id =s.ID , business_id = s.Business_Id, name= s.Name };
         }
 
         //המרת משמרת בודדת מסוג המחלקה לסוג המסד
         public static Shifts ConvertEntityToDB(ShiftsEntity s)
         {
-            return new Shifts() { ID = s.ID, Business_Id = s.Business_Id, Name = s.Name };
+            return new Shifts() { ID = s.id, Business_Id = s.business_id, Name = s.name };
         }
 
 

@@ -8,24 +8,24 @@ namespace Entity
 {
     public class EmployeesEntity
     {
-        public string ID { get; set; }
-        public string Name { get; set; }
+        public string id { get; set; }
+        public string name { get; set; }
         public string password { get; set; }
-        public int Role_id { get; set; }
-        public string Email { get; set; }
-        public int Business_Id { get; set; }
+        public int role_id { get; set; }
+        public string email { get; set; }
+        public int business_id { get; set; }
 
 
         //המרת עובד מסוג המסד לסוג המחלקה
         public static EmployeesEntity ConvertDBToEntity(Employees e)
         {
-            return new EmployeesEntity () { ID = e.ID,  Name=e.Name , password=e.Password , Role_id=e.Role_Id , Email=e.Email ,Business_Id = e.Business_Id };
+            return new EmployeesEntity () { id = e.ID,  name=e.Name , password=e.Password , role_id=e.Role_Id , email=e.Email ,business_id = e.Business_Id };
         }
 
         //המרת עובד מסוג המחלקה לסוג המסד
         public static Employees  ConvertEntityToDB(EmployeesEntity  e)
         {
-            return new Employees () { ID = e.ID, Name = e.Name, Password = e.password, Role_Id = e.Role_id, Email = e.Email, Business_Id = e.Business_Id };
+            return new Employees () { ID = e.id, Name = e.name, Password = e.password, Role_Id = e.role_id, Email = e.email, Business_Id = e.business_id };
         }
 
 

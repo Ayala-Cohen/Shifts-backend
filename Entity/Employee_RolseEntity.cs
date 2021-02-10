@@ -8,21 +8,21 @@ namespace Entity
 {
     public class Employee_RolesEntity
     {
-        public int ID { get; set; }
-        public int Business_Id { get; set; }
-        public string Role { get; set; }
-        public int Min_Of_Shift { get; set; }
+        public int id { get; set; }
+        public int business_id { get; set; }
+        public string role { get; set; }
+        public int min_of_shift { get; set; }
 
         //המרת תפקיד מסוג המסד לסוג המחלקה
         public static Employee_RolesEntity  ConvertDBToEntity(Employee_Roles e)
         {
-            return new Employee_RolesEntity() { ID = e.ID, Business_Id = e.Business_Id, Role = e.Role , Min_Of_Shift =e.Min_Of_Shift  };
+            return new Employee_RolesEntity() { id = e.ID, business_id = e.Business_Id, role = e.Role , min_of_shift =e.Min_Of_Shift  };
         }
 
         //המרת תפקיד מסוג המחלקה לסוג המסד
         public static Employee_Roles ConvertEntityToDB(Employee_RolesEntity e)
         {
-            return new Employee_Roles() { ID = e.ID, Business_Id = e.Business_Id, Role = e.Role, Min_Of_Shift = e.Min_Of_Shift };
+            return new Employee_Roles() { ID = e.id, Business_Id = e.business_id, Role = e.role, Min_Of_Shift = e.min_of_shift };
         }
 
 

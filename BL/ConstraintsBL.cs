@@ -34,8 +34,8 @@ namespace BL
         //פונקציה לעדכון אילוץ
         public static List<ConstraintsEntity> UpdateConstraint(ConstraintsEntity c)
         {
-            Constraints c_for_updating = ConnectDB.entity.Constraints.First(x => x.Shift_Id == c.Shift_Id && x.Employee_Id == c.Employee_Id);
-            c_for_updating.Day = c.Day;
+            Constraints c_for_updating = ConnectDB.entity.Constraints.First(x => x.Shift_Id == c.shift_id && x.Employee_Id == c.employee_id);
+            c_for_updating.Day = c.day;
             ConnectDB.entity.SaveChanges();
             return ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.ToList());
         }

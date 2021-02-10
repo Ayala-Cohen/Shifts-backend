@@ -34,10 +34,10 @@ namespace BL
         //פונקציה לעדכון תפקיד
         public static List<Employee_RolesEntity> UpdateEmployeeRole(Employee_RolesEntity e)
         {
-            Employee_Roles role_for_updating = ConnectDB.entity.Employee_Roles.First(x => x.ID == e.ID);
-            role_for_updating.Business_Id = e.Business_Id;
-            role_for_updating.Min_Of_Shift = e.Min_Of_Shift;
-            role_for_updating.Role = e.Role;
+            Employee_Roles role_for_updating = ConnectDB.entity.Employee_Roles.First(x => x.ID == e.id);
+            role_for_updating.Business_Id = e.business_id;
+            role_for_updating.Min_Of_Shift = e.min_of_shift;
+            role_for_updating.Role = e.role;
             ConnectDB.entity.SaveChanges();
             return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.ToList());
         }

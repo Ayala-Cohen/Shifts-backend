@@ -34,11 +34,11 @@ namespace BL
         //פונקציה לעדכון מחלקה
         public static List<DepartmentsEntity> UpdateDepartment(DepartmentsEntity d)
         {
-            Departments d_for_updating = ConnectDB.entity.Departments.First(x => x.ID == d.ID);
-            d_for_updating.Business_Id = d.Business_Id;
-            d_for_updating.Diary_Closing_Day = d.Diary_Closing_Day;
-            d_for_updating.Diary_Opening_Day = d.Diary_Opening_Day;
-            d_for_updating.Name = d.Name;
+            Departments d_for_updating = ConnectDB.entity.Departments.First(x => x.ID == d.id);
+            d_for_updating.Business_Id = d.business_id;
+            d_for_updating.Diary_Closing_Day = d.diary_closing_day;
+            d_for_updating.Diary_Opening_Day = d.diary_opening_day;
+            d_for_updating.Name = d.name;
             ConnectDB.entity.SaveChanges();
             return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.ToList());
         }

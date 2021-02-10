@@ -8,22 +8,22 @@ namespace Entity
 {
     public class Shift_EmployeesEntity
     {
-        public int Business_Id { get; set; }
-        public int Departments_Id { get; set; }
-        public int Role_Id { get; set; }
-        public int Shift_ID { get; set; }
-        public int Number_Of_Shift_Employees { get; set; }
+        public int business_id { get; set; }
+        public int department_id { get; set; }
+        public int role_id { get; set; }
+        public int shift_id { get; set; }
+        public int number_of_shift_employees { get; set; }
 
         //המרת עובד במשמרת מסוג המסד לסוג המחלקה
         public static Shift_EmployeesEntity  ConvertDBToEntity(Shift_Employees s)
         {
-            return new Shift_EmployeesEntity() {Business_Id =s.Business_Id , Departments_Id =s.Departments_Id , Role_Id =s.Role_Id , Shift_ID =s.Shift_ID , Number_Of_Shift_Employees =s.Number_Of_Shift_Employees };
+            return new Shift_EmployeesEntity() {business_id =s.Business_Id , department_id =s.Departments_Id , role_id =s.Role_Id , shift_id =s.Shift_ID , number_of_shift_employees =s.Number_Of_Shift_Employees };
         }
 
         //המרת עובד במשמרת מסוג המחלקה לסוג המסד
         public static Shift_Employees ConvertEntityToDB(Shift_EmployeesEntity s)
         {
-            return new Shift_Employees() { Business_Id = s.Business_Id, Departments_Id = s.Departments_Id, Role_Id = s.Role_Id, Shift_ID = s.Shift_ID, Number_Of_Shift_Employees = s.Number_Of_Shift_Employees };
+            return new Shift_Employees() { Business_Id = s.business_id, Departments_Id = s.department_id, Role_Id = s.role_id, Shift_ID = s.shift_id, Number_Of_Shift_Employees = s.number_of_shift_employees };
         }
 
         //המרת רשימה מסוג המסד לרשימה מסוג המחלקה

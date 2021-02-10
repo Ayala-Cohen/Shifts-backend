@@ -34,13 +34,13 @@ namespace BL
         //פונקציה לעדכון דירוג
         public static List<RatingEntity> UpdateRating(RatingEntity r)
         {
-            Rating rating_for_updating = ConnectDB.entity.Rating.First(x => x.Employee_ID == r.Employee_ID);
-            rating_for_updating.Rating_End_Date = r.Rating_End_Date;
-            rating_for_updating.Rating_Start_Date = r.Rating_Start_Date;
-            rating_for_updating.Shift_Id = r.Shift_Id;
-            rating_for_updating.Shift_Approved = r.Shift_Approved;
-            rating_for_updating.Rating1 = r.Rating1;
-            rating_for_updating.Day = r.Day;
+            Rating rating_for_updating = ConnectDB.entity.Rating.First(x => x.Employee_ID == r.employee_id);
+            rating_for_updating.Rating_End_Date = r.rating_end_date;
+            rating_for_updating.Rating_Start_Date = r.rating_start_date;
+            rating_for_updating.Shift_Id = r.shift_id;
+            rating_for_updating.Shift_Approved = r.shift_approved;
+            rating_for_updating.Rating1 = r.rating;
+            rating_for_updating.Day = r.day;
             ConnectDB.entity.SaveChanges();
             return RatingEntity.ConvertListDBToListEntity(ConnectDB.entity.Rating.ToList());
         }

@@ -8,23 +8,23 @@ namespace Entity
 {
     public class ConstraintsEntity
     {
-        public string Employee_Id { get; set; }
-        public int Shift_Id { get; set; }
-        public string Day { get; set; }
+        public string employee_id { get; set; }
+        public int shift_id { get; set; }
+        public string day { get; set; }
 
 
         //המרת אילוץ מסוג המסד לסוג המחלקה
 
         public static ConstraintsEntity ConvertDBToEntity(Constraints c)
         {
-            return new ConstraintsEntity() { Employee_Id =c.Employee_Id , Shift_Id =c.Shift_Id , Day =c.Day  };
+            return new ConstraintsEntity() { employee_id =c.Employee_Id , shift_id =c.Shift_Id , day =c.Day  };
         }
 
 
         //המרת אילוץ מסוג המחלקה לסוג המסד
         public static Constraints  ConvertEntityToDB(ConstraintsEntity c)
         {
-            return new Constraints () { Employee_Id = c.Employee_Id, Shift_Id = c.Shift_Id, Day = c.Day }; 
+            return new Constraints () { Employee_Id = c.employee_id, Shift_Id = c.shift_id, Day = c.day }; 
         }
 
         //המרת רשימה מסוג המסד לרשימה מסוג המחלקה
