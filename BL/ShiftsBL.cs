@@ -17,9 +17,9 @@ namespace BL
             return s;
         }
         //פונקציה לשליפת רשימת משמרות    
-        public static List<ShiftsEntity> GetAllShifts()
+        public static List<ShiftsEntity> GetAllShifts(int business_id)
         {
-            List<ShiftsEntity> l_shifts = ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.ToList());
+            List<ShiftsEntity> l_shifts = ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id == business_id).ToList());
             return l_shifts;
         }
 

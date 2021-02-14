@@ -48,5 +48,12 @@ namespace ShiftsApi.Controllers
         {
             return EmployeesBL.AddEmployee(e);
         }
+        [Route("CheckEmployee/{email}/{password}")]
+        [HttpGet]
+        //פונקציה לבדיקת פרטי עובד ע"י שם משתמש וסיסמה
+        public EmployeesEntity CheckEmployee(string email, string password)
+        {
+            return EmployeesBL.CheckEmployee(email, password);
+        }
     }
 }

@@ -52,5 +52,11 @@ namespace BL
             ConnectDB.entity.SaveChanges();
             return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.ToList());
         }
+        //פונקציה לבדיקת פרטי עובד ע"י שם משתמש וסיסמה
+        public static EmployeesEntity CheckEmployee(string email, string password)
+        {
+            EmployeesEntity e = EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x=>x.Email == email && x.Password == password));
+            return e;
+        }
     }
 }
