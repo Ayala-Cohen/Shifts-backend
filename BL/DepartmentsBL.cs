@@ -17,9 +17,9 @@ namespace BL
             return d;
         }
         //פונקציה לשליפת רשימת מחלקות
-        public static List<DepartmentsEntity> GetAllDepartments()
+        public static List<DepartmentsEntity> GetAllDepartments(int business_id)
         {
-            List<DepartmentsEntity> l_departments = DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.ToList());
+            List<DepartmentsEntity> l_departments = DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.Where(x => x.Business_Id == business_id).ToList());
             return l_departments;
         }
 
@@ -28,8 +28,9 @@ namespace BL
         {
             //מחיקה של כל הנתונים המקושרים לשדה זה קודם
             Departments d_for_deleting = ConnectDB.entity.Departments.First(x => x.ID == id);
+            int business_id = d_for_deleting.Business_Id;
             ConnectDB.entity.Departments.Remove(d_for_deleting);
-            return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.ToList());
+            return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.Where(x => x.Business_Id == business_id).ToList());
         }
         //פונקציה לעדכון מחלקה
         public static List<DepartmentsEntity> UpdateDepartment(DepartmentsEntity d)
@@ -40,15 +41,16 @@ namespace BL
             d_for_updating.Diary_Opening_Day = d.diary_opening_day;
             d_for_updating.Name = d.name;
             ConnectDB.entity.SaveChanges();
-            return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.ToList());
+            return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.Where(x => x.Business_Id == d.business_id).ToList());
         }
 
         //פונקציה להוספת מחלקה
         public static List<DepartmentsEntity> AddDepartment(DepartmentsEntity d)
         {
+
             ConnectDB.entity.Departments.Add(DepartmentsEntity.ConvertEntityToDB(d));
             ConnectDB.entity.SaveChanges();
-            return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.ToList());
+            return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.Where(x => x.Business_Id == d.business_id).ToList());
         }
     }
 }

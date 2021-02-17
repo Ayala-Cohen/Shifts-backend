@@ -13,11 +13,11 @@ namespace ShiftsApi.Controllers
     public class DepartmentsController : ApiController
     {
         //פונקציה להחזרת רשימת המחלקות
-        [Route("GetAllDepartments")]
+        [Route("GetAllDepartments/{business_id}")]
         [HttpGet]
-        public List<DepartmentsEntity> GetAllDepartments()
+        public List<DepartmentsEntity> GetAllDepartments(int business_id)
         {
-            return DepartmentsBL.GetAllDepartments();
+            return DepartmentsBL.GetAllDepartments(business_id);
         }
 
         //פונקציה להחזרת מחלקה ע"י קוד

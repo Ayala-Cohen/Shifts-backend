@@ -28,8 +28,9 @@ namespace BL
         {
             //מחיקה של כל הנתונים המקושרים לשדה זה קודם
             Shifts shift_for_deleting = ConnectDB.entity.Shifts.First(x => x.ID == id);
+            int business_id = shift_for_deleting.Business_Id;
             ConnectDB.entity.Shifts.Remove(shift_for_deleting);
-            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.ToList());
+            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id == business_id).ToList());
         }
         //פונקציה לעדכון משמרת
         public static List<ShiftsEntity> UpdateShift(ShiftsEntity s)
@@ -37,7 +38,7 @@ namespace BL
             Shifts shift_for_updating = ConnectDB.entity.Shifts.First(x => x.ID == s.id);
             shift_for_updating.Name = s.name;
             ConnectDB.entity.SaveChanges();
-            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.ToList());
+            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id == s.business_id).ToList());
         }
 
 
@@ -46,7 +47,7 @@ namespace BL
         {
             ConnectDB.entity.Shifts.Add(ShiftsEntity.ConvertEntityToDB(s));
             ConnectDB.entity.SaveChanges();
-            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.ToList());
+            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id==s.business_id).ToList());
         }
 
     }

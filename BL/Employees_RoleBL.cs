@@ -17,9 +17,9 @@ namespace BL
             return e;
         }
         //פונקציה לשליפת רשימת תפקידי עובדים
-        public static List<Employee_RolesEntity> GetAllEmployeesRoles()
+        public static List<Employee_RolesEntity> GetAllEmployeesRoles(int business_id)
         {
-            List<Employee_RolesEntity> l_employees_role = Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.ToList());
+            List<Employee_RolesEntity> l_employees_role = Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == business_id).ToList());
             return l_employees_role;
         }
 
@@ -28,8 +28,9 @@ namespace BL
         {
             //מחיקה של כל הנתונים המקושרים לשדה זה קודם
             Employee_Roles role_for_deleting = ConnectDB.entity.Employee_Roles.First(x => x.ID == id);
+            int business_id = role_for_deleting.Business_Id;
             ConnectDB.entity.Employee_Roles.Remove(role_for_deleting);
-            return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.ToList());
+            return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == business_id).ToList());
         }
         //פונקציה לעדכון תפקיד
         public static List<Employee_RolesEntity> UpdateEmployeeRole(Employee_RolesEntity e)
@@ -39,16 +40,17 @@ namespace BL
             role_for_updating.Min_Of_Shift = e.min_of_shift;
             role_for_updating.Role = e.role;
             ConnectDB.entity.SaveChanges();
-            return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.ToList());
+            return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == e.business_id).ToList());
         }
 
 
         //פונקציה להוספת תפקיד
         public static List<Employee_RolesEntity> AddEmployeeRole(Employee_RolesEntity e)
         {
+
             ConnectDB.entity.Employee_Roles.Add(Employee_RolesEntity.ConvertEntityToDB(e));
             ConnectDB.entity.SaveChanges();
-            return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.ToList());
+            return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == e.business_id).ToList());
         }
     }
 }

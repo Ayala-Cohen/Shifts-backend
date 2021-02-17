@@ -13,11 +13,11 @@ namespace ShiftsApi.Controllers
     public class Employees_RoleController : ApiController
     {
         //פונקציה להחזרת רשימת תפקידים
-        [Route("GetAllRoles")]
+        [Route("GetAllRoles/{business_id}")]
         [HttpGet]
-        public List<Employee_RolesEntity> GetAllRoles()
+        public List<Employee_RolesEntity> GetAllRoles(int business_id)
         {
-            return Employees_RoleBL.GetAllEmployeesRoles();
+            return Employees_RoleBL.GetAllEmployeesRoles(business_id);
         }
 
         //פונקציה להחזרת תפקיד ע"י קוד
