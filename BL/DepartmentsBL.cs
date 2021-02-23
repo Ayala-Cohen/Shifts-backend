@@ -26,7 +26,11 @@ namespace BL
         //פונקציה למחיקת מחלקה
         public static List<DepartmentsEntity> DeleteDepartment(int id)
         {
-            //מחיקה של כל הנתונים המקושרים לשדה זה קודם
+            //מחיקה של כל הנתונים המקושרים לשדה זה 
+            foreach (var item in ConnectDB.entity.Shift_Employees.Where(x=>x.Departments_Id == id))
+            {
+                ConnectDB.entity.Shift_Employees.Remove(item);
+            }
             Departments d_for_deleting = ConnectDB.entity.Departments.First(x => x.ID == id);
             int business_id = d_for_deleting.Business_Id;
             ConnectDB.entity.Departments.Remove(d_for_deleting);
@@ -47,9 +51,13 @@ namespace BL
         //פונקציה להוספת מחלקה
         public static List<DepartmentsEntity> AddDepartment(DepartmentsEntity d)
         {
+            try
+            {
+                ConnectDB.entity.Departments.Add(DepartmentsEntity.ConvertEntityToDB(d));
+                ConnectDB.entity.SaveChanges();
+            }
+            catch { }
 
-            ConnectDB.entity.Departments.Add(DepartmentsEntity.ConvertEntityToDB(d));
-            ConnectDB.entity.SaveChanges();
             return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.Where(x => x.Business_Id == d.business_id).ToList());
         }
     }

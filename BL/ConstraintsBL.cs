@@ -26,7 +26,6 @@ namespace BL
         //פונקציה למחיקת אילוץ
         public static List<ConstraintsEntity> DeleteConstraint(int s_id, string e_id)
         {
-            //מחיקה של כל הנתונים המקושרים לשדה זה קודם
             Constraints c_for_deleting = ConnectDB.entity.Constraints.First(x => x.Shift_Id == s_id && x.Employee_Id == e_id);
             ConnectDB.entity.Constraints.Remove(c_for_deleting);
             return ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.ToList());
@@ -43,8 +42,13 @@ namespace BL
         //פונקציה להוספת אילוץ
         public static List<ConstraintsEntity> AddConstraint(ConstraintsEntity c)
         {
-            ConnectDB.entity.Constraints.Add(ConstraintsEntity.ConvertEntityToDB(c));
-            ConnectDB.entity.SaveChanges();
+            try
+            {
+                ConnectDB.entity.Constraints.Add(ConstraintsEntity.ConvertEntityToDB(c));
+                ConnectDB.entity.SaveChanges();
+            }
+            catch
+            { }
             return ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.ToList());
         }
 

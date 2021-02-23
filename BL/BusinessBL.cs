@@ -27,7 +27,27 @@ namespace BL
         //פונקציה למחיקת עסק
         public static List<BusinessEntity> DeleteBusiness(int id)
         {
-            //מחיקה של כל הנתונים המקושרים לשדה זה קודם
+            //מחיקה של כל הנתונים המקושרים לשדה זה 
+            foreach (var item in ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == id))
+            {
+                ConnectDB.entity.Shift_Employees.Remove(item);
+            }
+            foreach (var item in ConnectDB.entity.Employees.Where(x=>x.Business_Id == id))
+            {
+                ConnectDB.entity.Employees.Remove(item);
+            }
+            foreach (var item in ConnectDB.entity.Departments.Where(x=>x.Business_Id == id))
+            {
+                ConnectDB.entity.Departments.Remove(item);
+            }
+            foreach (var item in ConnectDB.entity.Shifts.Where(x=>x.Business_Id == id))
+            {
+                ConnectDB.entity.Shifts.Remove(item);
+            }
+            foreach (var item in ConnectDB.entity.Employee_Roles.Where(x=>x.Business_Id == id))
+            {
+                ConnectDB.entity.Employee_Roles.Remove(item);
+            }
             Business business_for_deleting = ConnectDB.entity.Business.First(x => x.ID == id);
             ConnectDB.entity.Business.Remove(business_for_deleting);
             return BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
@@ -50,8 +70,13 @@ namespace BL
         //פונקציה להוספת עסק
         public static List<BusinessEntity> AddBusiness(BusinessEntity b)
         {
-            ConnectDB.entity.Business.Add(BusinessEntity.ConvertEntityToDB(b));
-            ConnectDB.entity.SaveChanges();
+            try
+            {
+                ConnectDB.entity.Business.Add(BusinessEntity.ConvertEntityToDB(b));
+                ConnectDB.entity.SaveChanges();
+            }
+            catch { }
+
             return BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
         }
 

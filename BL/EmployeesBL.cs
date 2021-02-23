@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using DAL;
 using Entity;
-
+using System.IO;
+using Excel = Microsoft.Office.Interop.Excel;
 namespace BL
 {
     public class EmployeesBL
@@ -26,7 +27,20 @@ namespace BL
         //פונקציה למחיקת עובד
         public static List<EmployeesEntity> DeleteEmployee(string id)
         {
-            //מחיקה של כל הנתונים המקושרים לשדה זה קודם
+            //מחיקה של כל הנתונים המקושרים לשדה זה 
+            foreach (var item in ConnectDB.entity.Rating.Where(x=>x.Employee_ID == id))
+            {
+                ConnectDB.entity.Rating.Remove(item);
+            }
+
+            foreach (var item in ConnectDB.entity.Constraints.Where(x=>x.Employee_Id == id))
+            {
+                ConnectDB.entity.Constraints.Remove(item);
+            }
+            //foreach (var item in ConnectDB.entity.)
+            //{
+
+            //}
             Employees employee_for_deleting = ConnectDB.entity.Employees.First(x => x.ID == id);
             int business_id = employee_for_deleting.Business_Id;
             ConnectDB.entity.Employees.Remove(employee_for_deleting);
@@ -49,8 +63,13 @@ namespace BL
         //פונקציה להוספת עובד
         public static List<EmployeesEntity> AddEmployee(EmployeesEntity e)
         {
-            ConnectDB.entity.Employees.Add(EmployeesEntity.ConvertEntityToDB(e));
-            ConnectDB.entity.SaveChanges();
+            try
+            {
+                ConnectDB.entity.Employees.Add(EmployeesEntity.ConvertEntityToDB(e));
+                ConnectDB.entity.SaveChanges();
+            }
+            catch
+            { }
             return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x=>x.Business_Id == e.business_id).ToList());
         }
         //פונקציה לבדיקת פרטי עובד ע"י שם משתמש וסיסמה
@@ -58,6 +77,28 @@ namespace BL
         {
             EmployeesEntity e = EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x=>x.Email == email && x.Password == password));
             return e;
+        }
+
+        public static void ImportFromExcel(int business_id,Excel.Application application)
+        {
+            Excel.Application xlapp = new Excel.Application();
+            //xlapp.GetOpenFilename(list_employees);
+            if (!File.Exists(application.Path))
+                File.Copy(application.Path, application.Name);
+            Excel.Workbook xlworkbook = xlapp.Workbooks.Open(application.Name);
+            Excel._Worksheet xlworksheet = xlworkbook.Sheets[1];
+            Excel.Range xlrange = xlworksheet.UsedRange;
+            for (int i = 1; i <= xlrange.Rows.Count; i++)
+            {
+                for (int j = 1; j <= xlrange.Columns.Count; j++)
+                {
+                    //if (j == 1)
+                        
+                    //if (xlrange.Cells[i, j] != null && xlrange.Cells[i, j].value2 != null)
+                    //    console.writeline(xlrange.Cells[i, j].value2.toString());
+                }
+            }
+            //return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());    
         }
     }
 }

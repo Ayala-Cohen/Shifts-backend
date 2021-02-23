@@ -26,7 +26,15 @@ namespace BL
         //פונקציה למחיקת תפקיד
         public static List<Employee_RolesEntity> DeleteEmployeeRole(int id)
         {
-            //מחיקה של כל הנתונים המקושרים לשדה זה קודם
+            //מחיקה של כל הנתונים המקושרים לשדה זה 
+            foreach (var item in ConnectDB.entity.Employees.Where(x=>x.Role_Id==id))
+            {
+                ConnectDB.entity.Employees.Remove(item);
+            }
+            foreach (var item in ConnectDB.entity.Shift_Employees.Where(x=>x.Role_Id==id))
+            {
+                ConnectDB.entity.Shift_Employees.Remove(item);
+            }
             Employee_Roles role_for_deleting = ConnectDB.entity.Employee_Roles.First(x => x.ID == id);
             int business_id = role_for_deleting.Business_Id;
             ConnectDB.entity.Employee_Roles.Remove(role_for_deleting);
@@ -47,9 +55,13 @@ namespace BL
         //פונקציה להוספת תפקיד
         public static List<Employee_RolesEntity> AddEmployeeRole(Employee_RolesEntity e)
         {
+            try
+            {
+                ConnectDB.entity.Employee_Roles.Add(Employee_RolesEntity.ConvertEntityToDB(e));
+                ConnectDB.entity.SaveChanges();
+            }
+            catch { }
 
-            ConnectDB.entity.Employee_Roles.Add(Employee_RolesEntity.ConvertEntityToDB(e));
-            ConnectDB.entity.SaveChanges();
             return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == e.business_id).ToList());
         }
     }

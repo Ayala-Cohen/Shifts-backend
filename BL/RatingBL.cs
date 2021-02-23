@@ -26,7 +26,6 @@ namespace BL
         //פונקציה למחיקת דירוג
         public static List<RatingEntity> DeleteRating(string id)
         {
-            //מחיקה של כל הנתונים המקושרים לשדה זה קודם
             Rating rating_for_deleting = ConnectDB.entity.Rating.First(x => x.Employee_ID == id);
             ConnectDB.entity.Rating.Remove(rating_for_deleting);
             return RatingEntity.ConvertListDBToListEntity(ConnectDB.entity.Rating.ToList());
@@ -49,8 +48,12 @@ namespace BL
         //פונקציה להוספת דירוג
         public static List<RatingEntity> AddRating(RatingEntity r)
         {
-            ConnectDB.entity.Rating.Add(RatingEntity.ConvertEntityToDB(r));
-            ConnectDB.entity.SaveChanges();
+            try
+            {
+                ConnectDB.entity.Rating.Add(RatingEntity.ConvertEntityToDB(r));
+                ConnectDB.entity.SaveChanges();
+            }
+            catch { }
             return RatingEntity.ConvertListDBToListEntity(ConnectDB.entity.Rating.ToList());
         }
     }

@@ -17,19 +17,19 @@ namespace BL
             return s;
         }
         //פונקציה לשליפת רשימת עובדים במשמרות
-        public static List<Shift_EmployeesEntity> GetAllEmployeesShifts()
+        public static List<Shift_EmployeesEntity> GetAllEmployeesShifts(int business_id)
         {
-            List<Shift_EmployeesEntity> l_employees_in_shifts = Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.ToList());
+            List<Shift_EmployeesEntity> l_employees_in_shifts = Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == business_id).ToList());
             return l_employees_in_shifts;
         }
 
         //פונקציה למחיקת עובד במשמרת
         public static List<Shift_EmployeesEntity> DeleteEmployeeShift(int id)
         {
-            //מחיקה של כל הנתונים המקושרים לשדה זה קודם
             Shift_Employees employee_shift_for_deleting = ConnectDB.entity.Shift_Employees.First(x => x.Shift_ID == id);
+            int business_id = employee_shift_for_deleting.Business_Id;
             ConnectDB.entity.Shift_Employees.Remove(employee_shift_for_deleting);
-            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.ToList());
+            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == business_id).ToList());
         }
         //פונקציה לעדכון עובד במשמרת
         public static List<Shift_EmployeesEntity> UpdateEmployeeShift(Shift_EmployeesEntity s)
@@ -40,7 +40,7 @@ namespace BL
             employee_in_shift_for_updating.Business_Id = s.business_id;
             employee_in_shift_for_updating.Departments_Id = s.department_id;
             ConnectDB.entity.SaveChanges();
-            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.ToList());
+            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == s.business_id).ToList());
         }
 
 
@@ -49,7 +49,7 @@ namespace BL
         {
             ConnectDB.entity.Shift_Employees.Add(Shift_EmployeesEntity.ConvertEntityToDB(s));
             ConnectDB.entity.SaveChanges();
-            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.ToList());
+            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == s.business_id).ToList());
         }
     }
 }

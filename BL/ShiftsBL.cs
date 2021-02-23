@@ -26,7 +26,19 @@ namespace BL
         //פונקציה למחיקת משמרת
         public static List<ShiftsEntity> DeleteShift(int id)
         {
-            //מחיקה של כל הנתונים המקושרים לשדה זה קודם
+            //מחיקה של כל הנתונים המקושרים לשדה זה 
+            foreach (var item in ConnectDB.entity.Constraints.Where(x=>x.Shift_Id == id))
+            {
+                ConnectDB.entity.Constraints.Remove(item);
+            }
+            foreach (var item in ConnectDB.entity.Shift_Employees.Where(x=>x.Shift_ID == id))
+            {
+                ConnectDB.entity.Shift_Employees.Remove(item);
+            }
+            foreach (var item in ConnectDB.entity.Rating.Where(x=>x.Shift_Id==id))
+            {
+                ConnectDB.entity.Rating.Remove(item);
+            }
             Shifts shift_for_deleting = ConnectDB.entity.Shifts.First(x => x.ID == id);
             int business_id = shift_for_deleting.Business_Id;
             ConnectDB.entity.Shifts.Remove(shift_for_deleting);
@@ -45,8 +57,13 @@ namespace BL
         //פונקציה להוספת משמרת
         public static List<ShiftsEntity> AddShift(ShiftsEntity s)
         {
-            ConnectDB.entity.Shifts.Add(ShiftsEntity.ConvertEntityToDB(s));
-            ConnectDB.entity.SaveChanges();
+            try
+            {
+                ConnectDB.entity.Shifts.Add(ShiftsEntity.ConvertEntityToDB(s));
+                ConnectDB.entity.SaveChanges();
+            }
+            catch { }
+
             return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id==s.business_id).ToList());
         }
 
