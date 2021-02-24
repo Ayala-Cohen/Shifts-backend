@@ -48,5 +48,12 @@ namespace ShiftsApi.Controllers
         {
             return BusinessBL.AddBusiness(b);
         }
+
+        [Route("GetBusinessBydirectorDetails/{email}/{password}")]
+        [HttpGet]
+        public BusinessEntity GetBusinessBydirectorDetails(string email, string password)
+        {
+            return BusinessBL.GetBusinessBydirectorDetails(email, password);
+        }
     }
 }

@@ -65,5 +65,14 @@ namespace ShiftsApi.Controllers
             EmployeesBL.ImportFromExcel(business_id, application);
         }
 
+
+        //פונקציה לשחזור סיסמה
+        [Route("ForgotPassword/{email}/{link}")]
+        [HttpGet]
+        public EmployeesEntity ForgotPassword(string email, string link)
+        {
+            return EmployeesBL.forgotPassword(email, link);
+        }
+
     }
 }

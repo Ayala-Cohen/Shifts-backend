@@ -7,6 +7,9 @@ using DAL;
 using Entity;
 using System.IO;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Net.Mail;
+using System.Net;
+
 namespace BL
 {
     public class EmployeesBL
@@ -20,7 +23,7 @@ namespace BL
         //פונקציה לשליפת רשימת עובדים
         public static List<EmployeesEntity> GetAllEmployees(int business_id)
         {
-            List<EmployeesEntity> l_employees = EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x=>x.Business_Id == business_id).ToList());
+            List<EmployeesEntity> l_employees = EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
             return l_employees;
         }
 
@@ -28,12 +31,12 @@ namespace BL
         public static List<EmployeesEntity> DeleteEmployee(string id)
         {
             //מחיקה של כל הנתונים המקושרים לשדה זה 
-            foreach (var item in ConnectDB.entity.Rating.Where(x=>x.Employee_ID == id))
+            foreach (var item in ConnectDB.entity.Rating.Where(x => x.Employee_ID == id))
             {
                 ConnectDB.entity.Rating.Remove(item);
             }
 
-            foreach (var item in ConnectDB.entity.Constraints.Where(x=>x.Employee_Id == id))
+            foreach (var item in ConnectDB.entity.Constraints.Where(x => x.Employee_Id == id))
             {
                 ConnectDB.entity.Constraints.Remove(item);
             }
@@ -44,7 +47,7 @@ namespace BL
             Employees employee_for_deleting = ConnectDB.entity.Employees.First(x => x.ID == id);
             int business_id = employee_for_deleting.Business_Id;
             ConnectDB.entity.Employees.Remove(employee_for_deleting);
-            return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x=>x.Business_Id == business_id).ToList());
+            return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
         }
         //פונקציה לעדכון עובד
         public static List<EmployeesEntity> UpdateEmployee(EmployeesEntity e)
@@ -56,7 +59,7 @@ namespace BL
             employee_for_updating.Role_Id = e.role_id;
             employee_for_updating.Business_Id = e.business_id;
             ConnectDB.entity.SaveChanges();
-            return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x=>x.Business_Id == e.business_id).ToList());
+            return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == e.business_id).ToList());
         }
 
 
@@ -70,16 +73,18 @@ namespace BL
             }
             catch
             { }
-            return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x=>x.Business_Id == e.business_id).ToList());
+            return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == e.business_id).ToList());
         }
         //פונקציה לבדיקת פרטי עובד ע"י שם משתמש וסיסמה
         public static EmployeesEntity CheckEmployee(string email, string password)
         {
-            EmployeesEntity e = EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x=>x.Email == email && x.Password == password));
-            return e;
+            Employees e = ConnectDB.entity.Employees.FirstOrDefault(x => x.Email == email && x.Password == password);
+            if (e != null)
+                return EmployeesEntity.ConvertDBToEntity(e);
+            return null;
         }
 
-        public static void ImportFromExcel(int business_id,Excel.Application application)
+        public static void ImportFromExcel(int business_id, Excel.Application application)
         {
             Excel.Application xlapp = new Excel.Application();
             //xlapp.GetOpenFilename(list_employees);
@@ -93,12 +98,33 @@ namespace BL
                 for (int j = 1; j <= xlrange.Columns.Count; j++)
                 {
                     //if (j == 1)
-                        
+
                     //if (xlrange.Cells[i, j] != null && xlrange.Cells[i, j].value2 != null)
                     //    console.writeline(xlrange.Cells[i, j].value2.toString());
                 }
             }
             //return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());    
+        }
+
+        //פונקציה לשחזור סיסמה
+        public static EmployeesEntity forgotPassword(string email, string link)
+        {
+            using (MailMessage mail = new MailMessage())
+            {
+                mail.From = new MailAddress("shiftssystem98@gmail.com");
+                mail.To.Add(email);
+                mail.Subject = "שחזור סיסמה";
+                mail.Body = "בקישור הבא תוכל לשחזר את סיסמתך" + "\n" + link;
+                mail.IsBodyHtml = true;
+
+                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                {
+                    smtp.Credentials = new NetworkCredential("shiftssystem98@gmail.com", "shs2021shs");
+                    smtp.EnableSsl = true;
+                    smtp.Send(mail);
+                }
+            }
+            return EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.Email == email));
         }
     }
 }

@@ -28,23 +28,23 @@ namespace BL
         public static List<BusinessEntity> DeleteBusiness(int id)
         {
             //מחיקה של כל הנתונים המקושרים לשדה זה 
-            foreach (var item in ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == id))
+            foreach (var item in ConnectDB.entity.Shift_Employees.Where(x => x.Business_Id == id))
             {
                 ConnectDB.entity.Shift_Employees.Remove(item);
             }
-            foreach (var item in ConnectDB.entity.Employees.Where(x=>x.Business_Id == id))
+            foreach (var item in ConnectDB.entity.Employees.Where(x => x.Business_Id == id))
             {
                 ConnectDB.entity.Employees.Remove(item);
             }
-            foreach (var item in ConnectDB.entity.Departments.Where(x=>x.Business_Id == id))
+            foreach (var item in ConnectDB.entity.Departments.Where(x => x.Business_Id == id))
             {
                 ConnectDB.entity.Departments.Remove(item);
             }
-            foreach (var item in ConnectDB.entity.Shifts.Where(x=>x.Business_Id == id))
+            foreach (var item in ConnectDB.entity.Shifts.Where(x => x.Business_Id == id))
             {
                 ConnectDB.entity.Shifts.Remove(item);
             }
-            foreach (var item in ConnectDB.entity.Employee_Roles.Where(x=>x.Business_Id == id))
+            foreach (var item in ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == id))
             {
                 ConnectDB.entity.Employee_Roles.Remove(item);
             }
@@ -78,6 +78,14 @@ namespace BL
             catch { }
 
             return BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
+        }
+
+        public static BusinessEntity GetBusinessBydirectorDetails(string email, string password)
+        {
+            Business b = ConnectDB.entity.Business.FirstOrDefault(x => x.User_Name == email && x.Password == password);
+            if (b != null)
+                return BusinessEntity.ConvertDBToEntity(b);
+            return null;
         }
 
     }
