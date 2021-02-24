@@ -66,12 +66,12 @@ namespace ShiftsApi.Controllers
         }
 
 
-        //פונקציה לשחזור סיסמה
-        [Route("ForgotPassword/{email}/{link}")]
-        [HttpGet]
-        public EmployeesEntity ForgotPassword(string email, string link)
+        //פונקציה לשליפת עובד ע"פ כתובת הדוא"ל שלו 
+        [Route("GetEmployeeByEmail")]
+        [HttpPost]
+        public EmployeesEntity GetEmployeeByEmail([FromBody] string email)
         {
-            return EmployeesBL.forgotPassword(email, link);
+            return EmployeesBL.GetEmployeeByEmail(email);
         }
 
     }

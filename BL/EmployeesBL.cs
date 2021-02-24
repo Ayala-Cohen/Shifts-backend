@@ -106,25 +106,13 @@ namespace BL
             //return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());    
         }
 
-        //פונקציה לשחזור סיסמה
-        public static EmployeesEntity forgotPassword(string email, string link)
+        //פונקציה לשליפת עובד ע"פ כתובת הדוא"ל שלו 
+        public static EmployeesEntity GetEmployeeByEmail(string email)
         {
-            using (MailMessage mail = new MailMessage())
-            {
-                mail.From = new MailAddress("shiftssystem98@gmail.com");
-                mail.To.Add(email);
-                mail.Subject = "שחזור סיסמה";
-                mail.Body = "בקישור הבא תוכל לשחזר את סיסמתך" + "\n" + link;
-                mail.IsBodyHtml = true;
-
-                using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
-                {
-                    smtp.Credentials = new NetworkCredential("shiftssystem98@gmail.com", "shs2021shs");
-                    smtp.EnableSsl = true;
-                    smtp.Send(mail);
-                }
-            }
-            return EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.Email == email));
+            Employees e = ConnectDB.entity.Employees.FirstOrDefault(x => x.Email == email);
+            if(e!=null)
+                return EmployeesEntity.ConvertDBToEntity(e);
+            return null;
         }
     }
 }
