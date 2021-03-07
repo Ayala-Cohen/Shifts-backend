@@ -4,16 +4,16 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="e70df21fa2104f298439b0dfd1c3dc48" Name="Diagram1">
-        <EntityTypeShape EntityType="ShiftsModel.Business" Width="1.5" PointX="0.75" PointY="4.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.Constraints" Width="1.5" PointX="9.75" PointY="3.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.Departments" Width="1.5" PointX="3" PointY="2.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.Employee_Roles" Width="1.5" PointX="3" PointY="6.25" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.Employees" Width="1.5" PointX="12" PointY="4.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.Rating" Width="1.5" PointX="9.75" PointY="7.125" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.Shift_Employees" Width="1.5" PointX="5.25" PointY="3.875" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.Shifts" Width="1.5" PointX="7.5" PointY="4.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.sysdiagrams" Width="1.5" PointX="5.75" PointY="0.75" IsExpanded="true" />
+      <Diagram DiagramId="e96285b411034f7c8e2b6ee9dfe0ee6e" Name="Diagram1">
+        <EntityTypeShape EntityType="ShiftsModel.Business" Width="1.5" PointX="0.75" PointY="6.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Constraints" Width="1.5" PointX="10.5" PointY="7.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Departments" Width="1.5" PointX="1.125" PointY="3.25" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Employee_Roles" Width="1.5" PointX="3" PointY="6.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Employees" Width="1.5" PointX="5.875" PointY="2.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Rating" Width="1.5" PointX="7.5" PointY="10" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Shift_Employees" Width="1.5" PointX="8.25" PointY="5.625" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Shifts" Width="1.5" PointX="3" PointY="10.125" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Shifts_In_Days" Width="1.5" PointX="5.25" PointY="10.375" IsExpanded="true" />
         <AssociationConnector Association="ShiftsModel.FK_Departments_Business" ManuallyRouted="false" />
         <AssociationConnector Association="ShiftsModel.FK_Shifts_Business" ManuallyRouted="false" />
         <AssociationConnector Association="ShiftsModel.FK_Table_Employee_Roles_Business" ManuallyRouted="false" />
@@ -24,10 +24,15 @@
         <AssociationConnector Association="ShiftsModel.FK_Table_Shift_Workers_Table_Departments" ManuallyRouted="false" />
         <AssociationConnector Association="ShiftsModel.FK_Employees_Employee_Roles" ManuallyRouted="false" />
         <AssociationConnector Association="ShiftsModel.FK_Shift_Employees_Employee_Roles" ManuallyRouted="false" />
-        <AssociationConnector Association="ShiftsModel.FK_Employees_Rating" ManuallyRouted="false" />
-        <AssociationConnector Association="ShiftsModel.FK_Table_Rating_Table_Shift" ManuallyRouted="false" />
-        <AssociationConnector Association="ShiftsModel.FK_Shifts_Shift_Employees1" ManuallyRouted="false" />
-        <AssociationConnector Association="ShiftsModel.Employees_Departments" ManuallyRouted="false" />
+        <AssociationConnector Association="ShiftsModel.FK_Rating_Shifts_In_Days" ManuallyRouted="false" />
+        <AssociationConnector Association="ShiftsModel.FK_Shift_Employees_Shifts" ManuallyRouted="false" />
+        <AssociationConnector Association="ShiftsModel.FK_Shifts_In_Days_Shifts" ManuallyRouted="false" />
+        <AssociationConnector Association="ShiftsModel.Employees_Departments" />
+        <EntityTypeShape EntityType="ShiftsModel.Assigning" Width="1.5" PointX="10.5" PointY="4.875" />
+        <EntityTypeShape EntityType="ShiftsModel.Satisfaction_Status" Width="1.5" PointX="8.125" PointY="2.5" />
+        <AssociationConnector Association="ShiftsModel.FK_Assigning_Departments" />
+        <AssociationConnector Association="ShiftsModel.FK_Assigning_Shifts_In_Days" />
+        <AssociationConnector Association="ShiftsModel.FK_Satisfaction_Status_Employees" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>
