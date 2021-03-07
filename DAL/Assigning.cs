@@ -12,18 +12,13 @@ namespace DAL
     using System;
     using System.Collections.Generic;
     
-    public partial class Shift_Employees
+    public partial class Assigning
     {
-        public int Business_Id { get; set; }
-        public int Departments_Id { get; set; }
-        public int Role_Id { get; set; }
-        public int Shift_ID { get; set; }
-        public int Number_Of_Shift_Employees { get; set; }
-        public string Day { get; set; }
+        public int Shift_In_Day_ID { get; set; }
+        public string Employee_ID { get; set; }
+        public int Department_ID { get; set; }
     
-        public virtual Business Business { get; set; }
         public virtual Departments Departments { get; set; }
-        public virtual Employee_Roles Employee_Roles { get; set; }
-        public virtual Shifts Shifts { get; set; }
+        public virtual Shifts_In_Days Shifts_In_Days { get; set; }
     }
 }

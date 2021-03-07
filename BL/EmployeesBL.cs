@@ -58,6 +58,7 @@ namespace BL
             employee_for_updating.Password = e.password;
             employee_for_updating.Role_Id = e.role_id;
             employee_for_updating.Business_Id = e.business_id;
+            employee_for_updating.Phone = e.phone;
             ConnectDB.entity.SaveChanges();
             return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == e.business_id).ToList());
         }

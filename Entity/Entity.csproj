@@ -45,11 +45,13 @@
     <Compile Include="ConstraintsEntity.cs" />
     <Compile Include="DapartmentsEntity.cs" />
     <Compile Include="EmployeesEntity.cs" />
+    <Compile Include="Employees_DepartmentsEntity.cs" />
     <Compile Include="Employee_RolseEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RatingEntity.cs" />
     <Compile Include="ShiftsEntity.cs" />
     <Compile Include="Shift_EmployeesEntity.cs" />
+    <Compile Include="Shift_In_DayEntity.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DAL\DAL.csproj">

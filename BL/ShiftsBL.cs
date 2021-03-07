@@ -13,20 +13,28 @@ namespace BL
         //פונקציה לשליפת משמרת בודדת על פי קוד
         public static ShiftsEntity GetShiftById(int id)
         {
-            ShiftsEntity s = ShiftsEntity.ConvertDBToEntity(ConnectDB.entity.Shifts.First(x => x.ID == id));
-            return s;
+            Shifts s = ConnectDB.entity.Shifts.First(x => x.ID == id);
+            if (s!= null)
+                return ShiftsEntity.ConvertDBToEntity(s);
+            return null;
         }
         //פונקציה לשליפת רשימת משמרות    
         public static List<ShiftsEntity> GetAllShifts(int business_id)
         {
-            List<ShiftsEntity> l_shifts = ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id == business_id).ToList());
-            return l_shifts;
+            List<Shifts> l_shifts = ConnectDB.entity.Shifts.Where(x => x.Business_Id == business_id).ToList();
+            if(l_shifts != null)
+                return ShiftsEntity.ConvertListDBToListEntity(l_shifts);
+            return null;
         }
 
         //פונקציה למחיקת משמרת
         public static List<ShiftsEntity> DeleteShift(int id)
         {
             //מחיקה של כל הנתונים המקושרים לשדה זה 
+            foreach (var item in ConnectDB.entity.Shifts_In_Days)
+            {
+                ConnectDB.entity.Shifts_In_Days.Remove(item);
+            }
             foreach (var item in ConnectDB.entity.Constraints.Where(x=>x.Shift_Id == id))
             {
                 ConnectDB.entity.Constraints.Remove(item);
@@ -59,6 +67,13 @@ namespace BL
         {
             try
             {
+                //הוספה לטבלת משמרות וימים
+                List<string> days = new List<string>() { "ראשון", "שני", "שלישי", "רביעי", "חמישי", "שישי", "שבת" };
+                foreach (var item in days)
+                {
+                    ConnectDB.entity.Shifts_In_Days.Add(Shift_In_DayEntity.ConvertEntityToDB(new Shift_In_DayEntity() { shift_id = s.id, day = item }));
+                }
+                //הוספה לטבלת משמרות
                 ConnectDB.entity.Shifts.Add(ShiftsEntity.ConvertEntityToDB(s));
                 ConnectDB.entity.SaveChanges();
             }

@@ -12,14 +12,12 @@ namespace DAL
     using System;
     using System.Collections.Generic;
     
-    public partial class Rating
+    public partial class Satisfaction_Status
     {
         public string Employee_ID { get; set; }
-        public string Rating1 { get; set; }
-        public int Shift_Id { get; set; }
-        public bool Shift_Approved { get; set; }
-        public int Shift_In_Day { get; set; }
+        public int Satisfaction_Status1 { get; set; }
+        public int ID { get; set; }
     
-        public virtual Shifts_In_Days Shifts_In_Days { get; set; }
+        public virtual Employees Employees { get; set; }
     }
 }

@@ -19,6 +19,7 @@ namespace DAL
         {
             this.Constraints = new HashSet<Constraints>();
             this.Departments = new HashSet<Departments>();
+            this.Satisfaction_Status = new HashSet<Satisfaction_Status>();
         }
     
         public string ID { get; set; }
@@ -27,13 +28,15 @@ namespace DAL
         public int Role_Id { get; set; }
         public string Email { get; set; }
         public int Business_Id { get; set; }
+        public string Phone { get; set; }
     
         public virtual Business Business { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Constraints> Constraints { get; set; }
         public virtual Employee_Roles Employee_Roles { get; set; }
-        public virtual Rating Rating { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Departments> Departments { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Satisfaction_Status> Satisfaction_Status { get; set; }
     }
 }

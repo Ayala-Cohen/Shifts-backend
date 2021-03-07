@@ -18,7 +18,8 @@ namespace DAL
         public Shifts()
         {
             this.Constraints = new HashSet<Constraints>();
-            this.Rating = new HashSet<Rating>();
+            this.Shift_Employees = new HashSet<Shift_Employees>();
+            this.Shifts_In_Days = new HashSet<Shifts_In_Days>();
         }
     
         public int ID { get; set; }
@@ -29,7 +30,8 @@ namespace DAL
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Constraints> Constraints { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Rating> Rating { get; set; }
-        public virtual Shift_Employees Shift_Employees { get; set; }
+        public virtual ICollection<Shift_Employees> Shift_Employees { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<Shifts_In_Days> Shifts_In_Days { get; set; }
     }
 }

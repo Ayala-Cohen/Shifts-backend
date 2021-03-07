@@ -12,27 +12,22 @@ namespace DAL
     using System;
     using System.Collections.Generic;
     
-    public partial class Departments
+    public partial class Shifts_In_Days
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
-        public Departments()
+        public Shifts_In_Days()
         {
-            this.Shift_Employees = new HashSet<Shift_Employees>();
-            this.Employees = new HashSet<Employees>();
+            this.Rating = new HashSet<Rating>();
             this.Assigning = new HashSet<Assigning>();
         }
     
+        public int Shift_ID { get; set; }
+        public string Day { get; set; }
         public int ID { get; set; }
-        public string Name { get; set; }
-        public int Business_Id { get; set; }
-        public System.DateTime Diary_Opening_Day { get; set; }
-        public System.DateTime Diary_Closing_Day { get; set; }
     
-        public virtual Business Business { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Shift_Employees> Shift_Employees { get; set; }
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
-        public virtual ICollection<Employees> Employees { get; set; }
+        public virtual ICollection<Rating> Rating { get; set; }
+        public virtual Shifts Shifts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Assigning> Assigning { get; set; }
     }

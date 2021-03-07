@@ -33,6 +33,8 @@ namespace DAL
         public virtual DbSet<Rating> Rating { get; set; }
         public virtual DbSet<Shift_Employees> Shift_Employees { get; set; }
         public virtual DbSet<Shifts> Shifts { get; set; }
-        public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
+        public virtual DbSet<Shifts_In_Days> Shifts_In_Days { get; set; }
+        public virtual DbSet<Assigning> Assigning { get; set; }
+        public virtual DbSet<Satisfaction_Status> Satisfaction_Status { get; set; }
     }
 }

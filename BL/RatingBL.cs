@@ -11,9 +11,9 @@ namespace BL
     public class RatingBL
     {
         //פונקציה לשליפת דירוג בודד על פי קוד
-        public static RatingEntity GetRatingById(string id)
+        public static RatingEntity GetRatingById(string e_id, int s_in_day)
         {
-            RatingEntity r = RatingEntity.ConvertDBToEntity(ConnectDB.entity.Rating.First(x => x.Employee_ID == id));
+            RatingEntity r = RatingEntity.ConvertDBToEntity(ConnectDB.entity.Rating.First(x => x.Employee_ID == e_id  && x.Shift_In_Day == s_in_day));
             return r;
         }
         //פונקציה לשליפת רשימת דירוגים
@@ -24,9 +24,9 @@ namespace BL
         }
 
         //פונקציה למחיקת דירוג
-        public static List<RatingEntity> DeleteRating(string id)
+        public static List<RatingEntity> DeleteRating(string e_id, int s_in_day)
         {
-            Rating rating_for_deleting = ConnectDB.entity.Rating.First(x => x.Employee_ID == id);
+            Rating rating_for_deleting = ConnectDB.entity.Rating.First(x => x.Employee_ID == e_id  && x.Shift_In_Day == s_in_day);
             ConnectDB.entity.Rating.Remove(rating_for_deleting);
             return RatingEntity.ConvertListDBToListEntity(ConnectDB.entity.Rating.ToList());
         }
@@ -34,12 +34,9 @@ namespace BL
         public static List<RatingEntity> UpdateRating(RatingEntity r)
         {
             Rating rating_for_updating = ConnectDB.entity.Rating.First(x => x.Employee_ID == r.employee_id);
-            rating_for_updating.Rating_End_Date = r.rating_end_date;
-            rating_for_updating.Rating_Start_Date = r.rating_start_date;
             rating_for_updating.Shift_Id = r.shift_id;
             rating_for_updating.Shift_Approved = r.shift_approved;
             rating_for_updating.Rating1 = r.rating;
-            rating_for_updating.Day = r.day;
             ConnectDB.entity.SaveChanges();
             return RatingEntity.ConvertListDBToListEntity(ConnectDB.entity.Rating.ToList());
         }

@@ -21,18 +21,18 @@ namespace ShiftsApi.Controllers
         }
 
         //פונקציה להחזרת דירוג ע"י קוד
-        [Route("GetRatingById/{id}")]
+        [Route("GetRatingById/{e_id}/{s_in_day}")]
         [HttpGet]
-        public RatingEntity GetRatingById(string id)
+        public RatingEntity GetRatingById(string e_id, int s_in_day)
         {
-            return RatingBL.GetRatingById(id);
+            return RatingBL.GetRatingById(e_id, s_in_day);
         }
         //פונקציה למחיקת דירוג
-        [Route("DeleteRating/{id}")]
+        [Route("DeleteRating/{e_id}/{s_in_day}")]
         [HttpDelete]
-        public List<RatingEntity> DeleteRating(string id)
+        public List<RatingEntity> DeleteRating(string e_id, int s_in_day)
         {
-            return RatingBL.DeleteRating(id);
+            return RatingBL.DeleteRating(e_id, s_in_day);
         }
         //פונקציה לעדכון דירוג
         [Route("UpdateRating")]

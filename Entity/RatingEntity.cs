@@ -9,23 +9,22 @@ namespace Entity
     public class RatingEntity
     {
         public string employee_id { get; set; }
-        public System.DateTime rating_start_date { get; set; }
-        public System.DateTime rating_end_date { get; set; }
         public string rating { get; set; }
-        public string day { get; set; }
         public int shift_id { get; set; }
         public bool shift_approved { get; set; }
+        public int shift_in_day { get; set; }
+
 
         //המרת דירוג מסוג המסד לסוג המחלקה
         public static RatingEntity ConvertDBToEntity(Rating r)
         {
-            return new RatingEntity () {employee_id =r.Employee_ID , rating_start_date=r.Rating_Start_Date , rating_end_date =r.Rating_End_Date , rating=r.Rating1 , day=r.Day , shift_id=r.Shift_Id , shift_approved =r.Shift_Approved };
+            return new RatingEntity () {employee_id =r.Employee_ID ,  rating=r.Rating1 , shift_id=r.Shift_Id , shift_approved =r.Shift_Approved, shift_in_day =r.Shift_In_Day};
         }
 
         //המרת דירוג מסוג המחלקה לסוג המסד
         public static Rating ConvertEntityToDB(RatingEntity r)
         {
-            return new Rating() { Employee_ID = r.employee_id, Rating_Start_Date = r.rating_start_date, Rating_End_Date = r.rating_end_date, Rating1 = r.rating, Day = r.day, Shift_Id = r.shift_id, Shift_Approved = r.shift_approved };
+            return new Rating() { Employee_ID = r.employee_id, Rating1 = r.rating, Shift_Id = r.shift_id, Shift_Approved = r.shift_approved, Shift_In_Day = r.shift_in_day };
         }
 
 
