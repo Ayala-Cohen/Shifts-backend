@@ -13,8 +13,11 @@ namespace BL
         //פונקציה לשליפת עובד במשמרת בודד על פי קוד
         public static Shift_EmployeesEntity GetEmployeesShiftById(int s_id, int r_id, string day)
         {
-            Shift_EmployeesEntity s = Shift_EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Shift_Employees.First(x => x.Shift_ID == s_id && x.Role_Id == r_id && x.Day == day));
-            return s;
+
+            Shift_Employees s = ConnectDB.entity.Shift_Employees.FirstOrDefault(x => x.Shift_ID == s_id && x.Role_Id == r_id && x.Day == day);
+            if(s!=null)
+                return Shift_EmployeesEntity.ConvertDBToEntity(s);
+            return null;
         }
         //פונקציה לשליפת רשימת עובדים במשמרות
         public static List<Shift_EmployeesEntity> GetAllEmployeesShifts(int business_id)
@@ -36,9 +39,6 @@ namespace BL
         {
             Shift_Employees employee_in_shift_for_updating = ConnectDB.entity.Shift_Employees.First(x => x.Shift_ID == s.shift_id);
             employee_in_shift_for_updating.Number_Of_Shift_Employees = s.number_of_shift_employees;
-            employee_in_shift_for_updating.Role_Id = s.role_id;
-            employee_in_shift_for_updating.Business_Id = s.business_id;
-            employee_in_shift_for_updating.Departments_Id = s.department_id;
             ConnectDB.entity.SaveChanges();
             return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == s.business_id).ToList());
         }
