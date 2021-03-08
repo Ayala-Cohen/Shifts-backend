@@ -50,6 +50,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assigning.cs">
+      <DependentUpon>ShiftsDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Business.cs">
       <DependentUpon>ShiftsDB.tt</DependentUpon>
     </Compile>
@@ -70,6 +73,9 @@
     <Compile Include="Rating.cs">
       <DependentUpon>ShiftsDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Satisfaction_Status.cs">
+      <DependentUpon>ShiftsDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Shifts.cs">
       <DependentUpon>ShiftsDB.tt</DependentUpon>
     </Compile>
@@ -88,40 +94,38 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>ShiftsDB.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Shifts_In_Days.cs">
+      <DependentUpon>ShiftsDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Shift_Employees.cs">
       <DependentUpon>ShiftsDB.tt</DependentUpon>
     </Compile>
-    <Compile Include="sysdiagrams.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <EntityDeploy Include="ShiftsDB.edmx">
-      <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>ShiftsDB.Designer.cs</LastGenOutput>
-    </EntityDeploy>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
     <None Include="packages.config" />
+    <EntityDeploy Include="ShiftsDB.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ShiftsDB.Designer.cs</LastGenOutput>
+    </EntityDeploy>
     <None Include="ShiftsDB.edmx.diagram">
       <DependentUpon>ShiftsDB.edmx</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="ShiftsDB.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>ShiftsDB.Context.cs</LastGenOutput>
       <DependentUpon>ShiftsDB.edmx</DependentUpon>
+      <LastGenOutput>ShiftsDB.Context.cs</LastGenOutput>
     </Content>
     <Content Include="ShiftsDB.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>ShiftsDB.edmx</DependentUpon>
       <LastGenOutput>ShiftsDB.cs</LastGenOutput>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
