@@ -17,14 +17,14 @@ namespace Entity
 
         public static ConstraintsEntity ConvertDBToEntity(Constraints c)
         {
-            return new ConstraintsEntity() { employee_id =c.Employee_Id , shift_id =c.Shift_Id , day =c.Day  };
+            return new ConstraintsEntity() { employee_id =c.Employee_Id , shift_id =c.Shift_ID , day =c.Day  };
         }
 
 
         //המרת אילוץ מסוג המחלקה לסוג המסד
         public static Constraints  ConvertEntityToDB(ConstraintsEntity c)
         {
-            return new Constraints () { Employee_Id = c.employee_id, Shift_Id = c.shift_id, Day = c.day }; 
+            return new Constraints () { Employee_Id = c.employee_id, Shift_ID = c.shift_id, Day = c.day }; 
         }
 
         //המרת רשימה מסוג המסד לרשימה מסוג המחלקה

@@ -60,5 +60,20 @@ namespace BL
 
             return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.Where(x => x.Business_Id == d.business_id).ToList());
         }
+
+        //פונקציה לשליפת רשימת משמרות למחלקה
+        public static List<Shift_In_DayEntity> GetShiftForDepartment(int d_id)
+        {
+            //שליפת משמרות לפי מחלקה
+            List<Shift_Employees> l = ConnectDB.entity.Shift_Employees.Where(x => x.Departments_Id == d_id).ToList();
+            List<Shift_In_DayEntity> l_shifts = new List<Shift_In_DayEntity>();
+            //המרה לסוג של טבלת משמרות ליום
+            foreach (var item in l.Select(x => new { shift_id = x.Shift_ID, day = x.Day }).ToList())
+            {
+                l_shifts.Add(Shift_In_DayEntity.ConvertDBToEntity(ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Shift_ID == item.shift_id)));
+            }
+            return l_shifts;
+
+        }
     }
 }

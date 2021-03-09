@@ -40,10 +40,6 @@ namespace BL
             {
                 ConnectDB.entity.Constraints.Remove(item);
             }
-            //foreach (var item in ConnectDB.entity.)
-            //{
-
-            //}
             Employees employee_for_deleting = ConnectDB.entity.Employees.First(x => x.ID == id);
             int business_id = employee_for_deleting.Business_Id;
             ConnectDB.entity.Employees.Remove(employee_for_deleting);
@@ -111,9 +107,37 @@ namespace BL
         public static EmployeesEntity GetEmployeeByEmail(string email)
         {
             Employees e = ConnectDB.entity.Employees.FirstOrDefault(x => x.Email == email);
-            if(e!=null)
+            if (e != null)
                 return EmployeesEntity.ConvertDBToEntity(e);
             return null;
         }
+
+        //פונקציה להחזרת עובדים שאינם משובצים בכל המשמרות שעליהם לבצע
+        public static Dictionary<string, int> GetEmployeesToAssigning(List<Assigning> assignings)
+        {
+            //לשנות בהתאם לאוסף המקומי
+            Dictionary<string, int> d = new Dictionary<string, int>();
+            foreach (var item in ConnectDB.entity.Employees)
+            {
+                int num = item.Employee_Roles.Min_Of_Shift - assignings.FindAll(x => x.Employee_ID == item.ID).Count();
+                d.Add(item.ID, num);
+            }
+            return d;
+        }
+
+        //פונקציה להחזרת העובד האופטימלי לשיבוץ
+        //public static EmployeesEntity GetOptimalEmployee()
+        //{
+        //    //לבדוק מקרה קצה של החזרת רשימה ריקה
+        //    List<string> e = ConnectDB.entity.Rating.Where(x => x.Rating1 == "מעדיף").Select(y=>y.Employee_ID).ToList();
+        //    Dictionary<string, Dictionary<int, int>> d = new Dictionary<string, Dictionary<int, int>>();
+        //    foreach (var item in ConnectDB.entity.Satisfaction_Status)
+        //    {
+        //        Dictionary<int, int> dic = new Dictionary<int, int>();
+        //        ConnectDB.entity.Satisfaction_Status.Select(x => new { stat_rating = x.Satisfaction_Status1, num = ConnectDB.entity.Satisfaction_Status.Count(y => y.Satisfaction_Status1 == item.Satisfaction_Status1) });
+        //        //d.Add(item.Employee_ID,);
+        //    }
+        //}
+
     }
 }

@@ -15,8 +15,8 @@ namespace DAL
     public partial class Constraints
     {
         public string Employee_Id { get; set; }
-        public int Shift_Id { get; set; }
         public string Day { get; set; }
+        public int Shift_ID { get; set; }
     
         public virtual Employees Employees { get; set; }
         public virtual Shifts Shifts { get; set; }

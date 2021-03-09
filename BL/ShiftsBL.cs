@@ -35,7 +35,7 @@ namespace BL
             {
                 ConnectDB.entity.Shifts_In_Days.Remove(item);
             }
-            foreach (var item in ConnectDB.entity.Constraints.Where(x=>x.Shift_Id == id))
+            foreach (var item in ConnectDB.entity.Constraints.Where(x=>x.Shift_ID == id))
             {
                 ConnectDB.entity.Constraints.Remove(item);
             }

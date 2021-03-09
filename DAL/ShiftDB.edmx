@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-    <Schema Namespace="ShiftsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+      <Schema Namespace="ShiftsModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="Assigning">
           <Key>
             <PropertyRef Name="Shift_In_Day_ID" />
@@ -30,11 +30,12 @@
         <EntityType Name="Constraints">
           <Key>
             <PropertyRef Name="Employee_Id" />
-            <PropertyRef Name="Shift_Id" />
+            <PropertyRef Name="Day" />
+            <PropertyRef Name="Shift_ID" />
           </Key>
           <Property Name="Employee_Id" Type="nvarchar" MaxLength="50" Nullable="false" />
-          <Property Name="Shift_Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Day" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Shift_ID" Type="int" Nullable="false" />
         </EntityType>
         <EntityType Name="Departments">
           <Key>
@@ -167,7 +168,7 @@
               <PropertyRef Name="ID" />
             </Principal>
             <Dependent Role="Constraints">
-              <PropertyRef Name="Shift_Id" />
+              <PropertyRef Name="Shift_ID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -192,6 +193,18 @@
             </Principal>
             <Dependent Role="Employees">
               <PropertyRef Name="Role_Id" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Rating_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="1" />
+          <End Role="Rating" Type="Self.Rating" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Rating">
+              <PropertyRef Name="Employee_ID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -376,6 +389,10 @@
             <End Role="Employee_Roles" EntitySet="Employee_Roles" />
             <End Role="Employees" EntitySet="Employees" />
           </AssociationSet>
+          <AssociationSet Name="FK_Rating_Employees" Association="Self.FK_Rating_Employees">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Rating" EntitySet="Rating" />
+          </AssociationSet>
           <AssociationSet Name="FK_Rating_Shifts_In_Days" Association="Self.FK_Rating_Shifts_In_Days">
             <End Role="Shifts_In_Days" EntitySet="Shifts_In_Days" />
             <End Role="Rating" EntitySet="Rating" />
@@ -425,10 +442,23 @@
             <End Role="Employees" EntitySet="Employees" />
           </AssociationSet>
         </EntityContainer>
-      </Schema></edmx:StorageModels>
+      </Schema>
+    </edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ShiftsModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Assigning">
+          <Key>
+            <PropertyRef Name="Shift_In_Day_ID" />
+            <PropertyRef Name="Employee_ID" />
+            <PropertyRef Name="Department_ID" />
+          </Key>
+          <Property Name="Shift_In_Day_ID" Type="Int32" Nullable="false" />
+          <Property Name="Employee_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Department_ID" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Departments" Relationship="Self.FK_Assigning_Departments" FromRole="Assigning" ToRole="Departments" />
+          <NavigationProperty Name="Shifts_In_Days" Relationship="Self.FK_Assigning_Shifts_In_Days" FromRole="Assigning" ToRole="Shifts_In_Days" />
+        </EntityType>
         <EntityType Name="Business">
           <Key>
             <PropertyRef Name="ID" />
@@ -449,11 +479,12 @@
         <EntityType Name="Constraints">
           <Key>
             <PropertyRef Name="Employee_Id" />
-            <PropertyRef Name="Shift_Id" />
+            <PropertyRef Name="Day" />
+            <PropertyRef Name="Shift_ID" />
           </Key>
           <Property Name="Employee_Id" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
-          <Property Name="Shift_Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Day" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Shift_ID" Type="Int32" Nullable="false" />
           <NavigationProperty Name="Employees" Relationship="Self.FK_Constraints_Employees" FromRole="Constraints" ToRole="Employees" />
           <NavigationProperty Name="Shifts" Relationship="Self.FK_Constraints_Shifts" FromRole="Constraints" ToRole="Shifts" />
         </EntityType>
@@ -466,10 +497,10 @@
           <Property Name="Business_Id" Type="Int32" Nullable="false" />
           <Property Name="Diary_Opening_Day" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="Diary_Closing_Day" Type="DateTime" Nullable="false" Precision="3" />
+          <NavigationProperty Name="Assigning" Relationship="Self.FK_Assigning_Departments" FromRole="Departments" ToRole="Assigning" />
           <NavigationProperty Name="Business" Relationship="Self.FK_Departments_Business" FromRole="Departments" ToRole="Business" />
           <NavigationProperty Name="Shift_Employees" Relationship="Self.FK_Table_Shift_Workers_Table_Departments" FromRole="Departments" ToRole="Shift_Employees" />
-          <NavigationProperty Name="Employees" Relationship="ShiftsModel.Employees_Departments" FromRole="Departments" ToRole="Employees" />
-          <NavigationProperty Name="Assigning" Relationship="ShiftsModel.FK_Assigning_Departments" FromRole="Departments" ToRole="Assigning" />
+          <NavigationProperty Name="Employees" Relationship="Self.Employees_Departments" FromRole="Departments" ToRole="Employees" />
         </EntityType>
         <EntityType Name="Employee_Roles">
           <Key>
@@ -497,8 +528,9 @@
           <NavigationProperty Name="Business" Relationship="Self.FK_Table_Workers_Business" FromRole="Employees" ToRole="Business" />
           <NavigationProperty Name="Constraints" Relationship="Self.FK_Constraints_Employees" FromRole="Employees" ToRole="Constraints" />
           <NavigationProperty Name="Employee_Roles" Relationship="Self.FK_Employees_Employee_Roles" FromRole="Employees" ToRole="Employee_Roles" />
-          <NavigationProperty Name="Departments" Relationship="ShiftsModel.Employees_Departments" FromRole="Employees" ToRole="Departments" />
-          <NavigationProperty Name="Satisfaction_Status" Relationship="ShiftsModel.FK_Satisfaction_Status_Employees" FromRole="Employees" ToRole="Satisfaction_Status" />
+          <NavigationProperty Name="Rating" Relationship="Self.FK_Rating_Employees" FromRole="Employees" ToRole="Rating" />
+          <NavigationProperty Name="Satisfaction_Status" Relationship="Self.FK_Satisfaction_Status_Employees" FromRole="Employees" ToRole="Satisfaction_Status" />
+          <NavigationProperty Name="Departments" Relationship="Self.Employees_Departments" FromRole="Employees" ToRole="Departments" />
         </EntityType>
         <EntityType Name="Rating">
           <Key>
@@ -510,7 +542,17 @@
           <Property Name="Shift_Id" Type="Int32" Nullable="false" />
           <Property Name="Shift_Approved" Type="Boolean" Nullable="false" />
           <Property Name="Shift_In_Day" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Employees" Relationship="Self.FK_Rating_Employees" FromRole="Rating" ToRole="Employees" />
           <NavigationProperty Name="Shifts_In_Days" Relationship="Self.FK_Rating_Shifts_In_Days" FromRole="Rating" ToRole="Shifts_In_Days" />
+        </EntityType>
+        <EntityType Name="Satisfaction_Status">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="Employee_ID" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Satisfaction_Status1" Type="Int32" Nullable="false" />
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Employees" Relationship="Self.FK_Satisfaction_Status_Employees" FromRole="Satisfaction_Status" ToRole="Employees" />
         </EntityType>
         <EntityType Name="Shift_Employees">
           <Key>
@@ -521,7 +563,7 @@
           <Property Name="Business_Id" Type="Int32" Nullable="false" />
           <Property Name="Departments_Id" Type="Int32" Nullable="false" />
           <Property Name="Role_Id" Type="Int32" Nullable="false" />
-          <Property Name="Shift_ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Shift_ID" Type="Int32" Nullable="false" />
           <Property Name="Number_Of_Shift_Employees" Type="Int32" Nullable="false" />
           <Property Name="Day" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <NavigationProperty Name="Business" Relationship="Self.FK_Table_Shift_Workers_Business" FromRole="Shift_Employees" ToRole="Business" />
@@ -548,10 +590,34 @@
           <Property Name="Shift_ID" Type="Int32" Nullable="false" />
           <Property Name="Day" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <NavigationProperty Name="Assigning" Relationship="Self.FK_Assigning_Shifts_In_Days" FromRole="Shifts_In_Days" ToRole="Assigning" />
           <NavigationProperty Name="Rating" Relationship="Self.FK_Rating_Shifts_In_Days" FromRole="Shifts_In_Days" ToRole="Rating" />
           <NavigationProperty Name="Shifts" Relationship="Self.FK_Shifts_In_Days_Shifts" FromRole="Shifts_In_Days" ToRole="Shifts" />
-          <NavigationProperty Name="Assigning" Relationship="ShiftsModel.FK_Assigning_Shifts_In_Days" FromRole="Shifts_In_Days" ToRole="Assigning" />
         </EntityType>
+        <Association Name="FK_Assigning_Departments">
+          <End Role="Departments" Type="Self.Departments" Multiplicity="1" />
+          <End Role="Assigning" Type="Self.Assigning" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Departments">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Assigning">
+              <PropertyRef Name="Department_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Assigning_Shifts_In_Days">
+          <End Role="Shifts_In_Days" Type="Self.Shifts_In_Days" Multiplicity="1" />
+          <End Role="Assigning" Type="Self.Assigning" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Shifts_In_Days">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Assigning">
+              <PropertyRef Name="Shift_In_Day_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Departments_Business">
           <End Role="Business" Type="Self.Business" Multiplicity="1" />
           <End Role="Departments" Type="Self.Departments" Multiplicity="*" />
@@ -632,7 +698,7 @@
               <PropertyRef Name="ID" />
             </Principal>
             <Dependent Role="Constraints">
-              <PropertyRef Name="Shift_Id" />
+              <PropertyRef Name="Shift_ID" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -672,6 +738,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_Rating_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="1" />
+          <End Role="Rating" Type="Self.Rating" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Rating">
+              <PropertyRef Name="Employee_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Satisfaction_Status_Employees">
+          <End Role="Employees" Type="Self.Employees" Multiplicity="1" />
+          <End Role="Satisfaction_Status" Type="Self.Satisfaction_Status" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Employees">
+              <PropertyRef Name="ID" />
+            </Principal>
+            <Dependent Role="Satisfaction_Status">
+              <PropertyRef Name="Employee_ID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_Rating_Shifts_In_Days">
           <End Role="Shifts_In_Days" Type="Self.Shifts_In_Days" Multiplicity="1" />
           <End Role="Rating" Type="Self.Rating" Multiplicity="*" />
@@ -708,16 +798,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
-        <EntityContainer Name="ShiftsEntities" annotation:LazyLoadingEnabled="true">
+        <Association Name="Employees_Departments">
+          <End Role="Departments" Type="Self.Departments" Multiplicity="*" />
+          <End Role="Employees" Type="Self.Employees" Multiplicity="*" />
+        </Association>
+        <EntityContainer Name="ShiftEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Assigning" EntityType="Self.Assigning" />
           <EntitySet Name="Business" EntityType="Self.Business" />
           <EntitySet Name="Constraints" EntityType="Self.Constraints" />
           <EntitySet Name="Departments" EntityType="Self.Departments" />
           <EntitySet Name="Employee_Roles" EntityType="Self.Employee_Roles" />
           <EntitySet Name="Employees" EntityType="Self.Employees" />
           <EntitySet Name="Rating" EntityType="Self.Rating" />
+          <EntitySet Name="Satisfaction_Status" EntityType="Self.Satisfaction_Status" />
           <EntitySet Name="Shift_Employees" EntityType="Self.Shift_Employees" />
           <EntitySet Name="Shifts" EntityType="Self.Shifts" />
           <EntitySet Name="Shifts_In_Days" EntityType="Self.Shifts_In_Days" />
+          <AssociationSet Name="FK_Assigning_Departments" Association="Self.FK_Assigning_Departments">
+            <End Role="Departments" EntitySet="Departments" />
+            <End Role="Assigning" EntitySet="Assigning" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Assigning_Shifts_In_Days" Association="Self.FK_Assigning_Shifts_In_Days">
+            <End Role="Shifts_In_Days" EntitySet="Shifts_In_Days" />
+            <End Role="Assigning" EntitySet="Assigning" />
+          </AssociationSet>
           <AssociationSet Name="FK_Departments_Business" Association="Self.FK_Departments_Business">
             <End Role="Business" EntitySet="Business" />
             <End Role="Departments" EntitySet="Departments" />
@@ -758,6 +862,14 @@
             <End Role="Employee_Roles" EntitySet="Employee_Roles" />
             <End Role="Shift_Employees" EntitySet="Shift_Employees" />
           </AssociationSet>
+          <AssociationSet Name="FK_Rating_Employees" Association="Self.FK_Rating_Employees">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Rating" EntitySet="Rating" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Satisfaction_Status_Employees" Association="Self.FK_Satisfaction_Status_Employees">
+            <End Role="Employees" EntitySet="Employees" />
+            <End Role="Satisfaction_Status" EntitySet="Satisfaction_Status" />
+          </AssociationSet>
           <AssociationSet Name="FK_Rating_Shifts_In_Days" Association="Self.FK_Rating_Shifts_In_Days">
             <End Role="Shifts_In_Days" EntitySet="Shifts_In_Days" />
             <End Role="Rating" EntitySet="Rating" />
@@ -770,92 +882,26 @@
             <End Role="Shifts" EntitySet="Shifts" />
             <End Role="Shifts_In_Days" EntitySet="Shifts_In_Days" />
           </AssociationSet>
-          <AssociationSet Name="Employees_Departments" Association="ShiftsModel.Employees_Departments">
+          <AssociationSet Name="Employees_Departments" Association="Self.Employees_Departments">
             <End Role="Departments" EntitySet="Departments" />
             <End Role="Employees" EntitySet="Employees" />
-          </AssociationSet>
-          <EntitySet Name="Assigning" EntityType="ShiftsModel.Assigning" />
-          <EntitySet Name="Satisfaction_Status" EntityType="ShiftsModel.Satisfaction_Status" />
-          <AssociationSet Name="FK_Assigning_Departments" Association="ShiftsModel.FK_Assigning_Departments">
-            <End Role="Departments" EntitySet="Departments" />
-            <End Role="Assigning" EntitySet="Assigning" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Assigning_Shifts_In_Days" Association="ShiftsModel.FK_Assigning_Shifts_In_Days">
-            <End Role="Shifts_In_Days" EntitySet="Shifts_In_Days" />
-            <End Role="Assigning" EntitySet="Assigning" />
-          </AssociationSet>
-          <AssociationSet Name="FK_Satisfaction_Status_Employees" Association="ShiftsModel.FK_Satisfaction_Status_Employees">
-            <End Role="Employees" EntitySet="Employees" />
-            <End Role="Satisfaction_Status" EntitySet="Satisfaction_Status" />
           </AssociationSet>
         </EntityContainer>
-        <Association Name="Employees_Departments">
-          <End Type="ShiftsModel.Departments" Role="Departments" Multiplicity="*" />
-          <End Type="ShiftsModel.Employees" Role="Employees" Multiplicity="*" />
-        </Association>
-        <EntityType Name="Assigning">
-          <Key>
-            <PropertyRef Name="Shift_In_Day_ID" />
-            <PropertyRef Name="Employee_ID" />
-            <PropertyRef Name="Department_ID" />
-          </Key>
-          <Property Name="Shift_In_Day_ID" Type="Int32" Nullable="false" />
-          <Property Name="Employee_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Department_ID" Type="Int32" Nullable="false" />
-          <NavigationProperty Name="Departments" Relationship="ShiftsModel.FK_Assigning_Departments" FromRole="Assigning" ToRole="Departments" />
-          <NavigationProperty Name="Shifts_In_Days" Relationship="ShiftsModel.FK_Assigning_Shifts_In_Days" FromRole="Assigning" ToRole="Shifts_In_Days" />
-        </EntityType>
-        <EntityType Name="Satisfaction_Status">
-          <Key>
-            <PropertyRef Name="ID" />
-          </Key>
-          <Property Name="Employee_ID" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
-          <Property Name="Satisfaction_Status1" Type="Int32" Nullable="false" />
-          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
-          <NavigationProperty Name="Employees" Relationship="ShiftsModel.FK_Satisfaction_Status_Employees" FromRole="Satisfaction_Status" ToRole="Employees" />
-        </EntityType>
-        <Association Name="FK_Assigning_Departments">
-          <End Type="ShiftsModel.Departments" Role="Departments" Multiplicity="1" />
-          <End Type="ShiftsModel.Assigning" Role="Assigning" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Departments">
-              <PropertyRef Name="ID" />
-            </Principal>
-            <Dependent Role="Assigning">
-              <PropertyRef Name="Department_ID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Assigning_Shifts_In_Days">
-          <End Type="ShiftsModel.Shifts_In_Days" Role="Shifts_In_Days" Multiplicity="1" />
-          <End Type="ShiftsModel.Assigning" Role="Assigning" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Shifts_In_Days">
-              <PropertyRef Name="ID" />
-            </Principal>
-            <Dependent Role="Assigning">
-              <PropertyRef Name="Shift_In_Day_ID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <Association Name="FK_Satisfaction_Status_Employees">
-          <End Type="ShiftsModel.Employees" Role="Employees" Multiplicity="1" />
-          <End Type="ShiftsModel.Satisfaction_Status" Role="Satisfaction_Status" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Employees">
-              <PropertyRef Name="ID" />
-            </Principal>
-            <Dependent Role="Satisfaction_Status">
-              <PropertyRef Name="Employee_ID" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
     <edmx:Mappings>
       <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
-        <EntityContainerMapping StorageEntityContainer="ShiftsModelStoreContainer" CdmEntityContainer="ShiftsEntities">
+        <EntityContainerMapping StorageEntityContainer="ShiftsModelStoreContainer" CdmEntityContainer="ShiftEntities">
+          <EntitySetMapping Name="Assigning">
+            <EntityTypeMapping TypeName="ShiftsModel.Assigning">
+              <MappingFragment StoreEntitySet="Assigning">
+                <ScalarProperty Name="Shift_In_Day_ID" ColumnName="Shift_In_Day_ID" />
+                <ScalarProperty Name="Employee_ID" ColumnName="Employee_ID" />
+                <ScalarProperty Name="Department_ID" ColumnName="Department_ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Business">
             <EntityTypeMapping TypeName="ShiftsModel.Business">
               <MappingFragment StoreEntitySet="Business">
@@ -873,8 +919,8 @@
             <EntityTypeMapping TypeName="ShiftsModel.Constraints">
               <MappingFragment StoreEntitySet="Constraints">
                 <ScalarProperty Name="Employee_Id" ColumnName="Employee_Id" />
-                <ScalarProperty Name="Shift_Id" ColumnName="Shift_Id" />
                 <ScalarProperty Name="Day" ColumnName="Day" />
+                <ScalarProperty Name="Shift_ID" ColumnName="Shift_ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
@@ -923,6 +969,15 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
+          <EntitySetMapping Name="Satisfaction_Status">
+            <EntityTypeMapping TypeName="ShiftsModel.Satisfaction_Status">
+              <MappingFragment StoreEntitySet="Satisfaction_Status">
+                <ScalarProperty Name="Employee_ID" ColumnName="Employee_ID" />
+                <ScalarProperty Name="Satisfaction_Status1" ColumnName="Satisfaction_Status" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
           <EntitySetMapping Name="Shift_Employees">
             <EntityTypeMapping TypeName="ShiftsModel.Shift_Employees">
               <MappingFragment StoreEntitySet="Shift_Employees">
@@ -954,32 +1009,14 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <AssociationSetMapping Name="Employees_Departments" TypeName="ShiftsModel.Employees_Departments" StoreEntitySet="Employees_Departments">
-            <EndProperty Name="Employees">
-              <ScalarProperty Name="ID" ColumnName="Employee_ID" />
-            </EndProperty>
             <EndProperty Name="Departments">
               <ScalarProperty Name="ID" ColumnName="Departments_ID" />
             </EndProperty>
+            <EndProperty Name="Employees">
+              <ScalarProperty Name="ID" ColumnName="Employee_ID" />
+            </EndProperty>
           </AssociationSetMapping>
-          <EntitySetMapping Name="Assigning">
-            <EntityTypeMapping TypeName="ShiftsModel.Assigning">
-              <MappingFragment StoreEntitySet="Assigning">
-                <ScalarProperty Name="Department_ID" ColumnName="Department_ID" />
-                <ScalarProperty Name="Employee_ID" ColumnName="Employee_ID" />
-                <ScalarProperty Name="Shift_In_Day_ID" ColumnName="Shift_In_Day_ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          <EntitySetMapping Name="Satisfaction_Status">
-            <EntityTypeMapping TypeName="ShiftsModel.Satisfaction_Status">
-              <MappingFragment StoreEntitySet="Satisfaction_Status">
-                <ScalarProperty Name="ID" ColumnName="ID" />
-                <ScalarProperty Name="Satisfaction_Status1" ColumnName="Satisfaction_Status" />
-                <ScalarProperty Name="Employee_ID" ColumnName="Employee_ID" />
-              </MappingFragment>
-            </EntityTypeMapping>
-          </EntitySetMapping>
-          </EntityContainerMapping>
+        </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>
   </edmx:Runtime>

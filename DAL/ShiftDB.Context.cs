@@ -13,10 +13,10 @@ namespace DAL
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
     
-    public partial class ShiftsEntities : DbContext
+    public partial class ShiftEntities : DbContext
     {
-        public ShiftsEntities()
-            : base("name=ShiftsEntities")
+        public ShiftEntities()
+            : base("name=ShiftEntities")
         {
         }
     
@@ -25,16 +25,16 @@ namespace DAL
             throw new UnintentionalCodeFirstException();
         }
     
+        public virtual DbSet<Assigning> Assigning { get; set; }
         public virtual DbSet<Business> Business { get; set; }
         public virtual DbSet<Constraints> Constraints { get; set; }
         public virtual DbSet<Departments> Departments { get; set; }
         public virtual DbSet<Employee_Roles> Employee_Roles { get; set; }
         public virtual DbSet<Employees> Employees { get; set; }
         public virtual DbSet<Rating> Rating { get; set; }
+        public virtual DbSet<Satisfaction_Status> Satisfaction_Status { get; set; }
         public virtual DbSet<Shift_Employees> Shift_Employees { get; set; }
         public virtual DbSet<Shifts> Shifts { get; set; }
         public virtual DbSet<Shifts_In_Days> Shifts_In_Days { get; set; }
-        public virtual DbSet<Assigning> Assigning { get; set; }
-        public virtual DbSet<Satisfaction_Status> Satisfaction_Status { get; set; }
     }
 }

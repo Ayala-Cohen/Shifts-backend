@@ -20,6 +20,7 @@ namespace DAL
         public bool Shift_Approved { get; set; }
         public int Shift_In_Day { get; set; }
     
+        public virtual Employees Employees { get; set; }
         public virtual Shifts_In_Days Shifts_In_Days { get; set; }
     }
 }

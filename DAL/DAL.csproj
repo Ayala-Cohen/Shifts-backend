@@ -51,80 +51,80 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assigning.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Business.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
     <Compile Include="ConnectDB.cs" />
     <Compile Include="Constraints.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Departments.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Employees.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Employee_Roles.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rating.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Satisfaction_Status.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ShiftDB.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ShiftDB.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ShiftDB.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
+    </Compile>
+    <Compile Include="ShiftDB.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ShiftDB.edmx</DependentUpon>
     </Compile>
     <Compile Include="Shifts.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ShiftsDB.Context.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ShiftsDB.Context.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ShiftsDB.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
-    </Compile>
-    <Compile Include="ShiftsDB.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>ShiftsDB.edmx</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Shifts_In_Days.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
     <Compile Include="Shift_Employees.cs">
-      <DependentUpon>ShiftsDB.tt</DependentUpon>
+      <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="App.Config" />
     <None Include="packages.config" />
-    <EntityDeploy Include="ShiftsDB.edmx">
+    <EntityDeploy Include="ShiftDB.edmx">
       <Generator>EntityModelCodeGenerator</Generator>
-      <LastGenOutput>ShiftsDB.Designer.cs</LastGenOutput>
+      <LastGenOutput>ShiftDB.Designer.cs</LastGenOutput>
     </EntityDeploy>
-    <None Include="ShiftsDB.edmx.diagram">
-      <DependentUpon>ShiftsDB.edmx</DependentUpon>
+    <None Include="ShiftDB.edmx.diagram">
+      <DependentUpon>ShiftDB.edmx</DependentUpon>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="ShiftsDB.Context.tt">
+    <Content Include="ShiftDB.Context.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ShiftsDB.edmx</DependentUpon>
-      <LastGenOutput>ShiftsDB.Context.cs</LastGenOutput>
+      <DependentUpon>ShiftDB.edmx</DependentUpon>
+      <LastGenOutput>ShiftDB.Context.cs</LastGenOutput>
     </Content>
-    <Content Include="ShiftsDB.tt">
+    <Content Include="ShiftDB.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <DependentUpon>ShiftsDB.edmx</DependentUpon>
-      <LastGenOutput>ShiftsDB.cs</LastGenOutput>
+      <DependentUpon>ShiftDB.edmx</DependentUpon>
+      <LastGenOutput>ShiftDB.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

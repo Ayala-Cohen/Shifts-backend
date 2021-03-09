@@ -42,11 +42,11 @@ namespace ShiftsApi.Controllers
             return RatingBL.UpdateRating(r);
         }
         //פונקציה להוספת דירוג
-        [Route("AddRating")]
+        [Route("AddRating/{day}")]
         [HttpPut]
-        public List<RatingEntity> AddRating([FromBody] RatingEntity r)
+        public List<RatingEntity> AddRating([FromBody] RatingEntity r, string day)
         {
-            return RatingBL.AddRating(r);
+            return RatingBL.AddRating(r, day);
         }
     }
 }
