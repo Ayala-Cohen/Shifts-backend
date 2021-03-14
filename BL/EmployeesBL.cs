@@ -81,26 +81,70 @@ namespace BL
             return null;
         }
 
-        public static void ImportFromExcel(int business_id, Excel.Application application)
+        public static List<EmployeesEntity> ImportFromExcel(int business_id, string filePath)
         {
+            EmployeesEntity e = new EmployeesEntity();
             Excel.Application xlapp = new Excel.Application();
-            //xlapp.GetOpenFilename(list_employees);
-            if (!File.Exists(application.Path))
-                File.Copy(application.Path, application.Name);
-            Excel.Workbook xlworkbook = xlapp.Workbooks.Open(application.Name);
+            Excel.Workbook xlworkbook = xlapp.Workbooks.Open(filePath);
             Excel._Worksheet xlworksheet = xlworkbook.Sheets[1];
             Excel.Range xlrange = xlworksheet.UsedRange;
-            for (int i = 1; i <= xlrange.Rows.Count; i++)
+            try
             {
-                for (int j = 1; j <= xlrange.Columns.Count; j++)
-                {
-                    //if (j == 1)
 
-                    //if (xlrange.Cells[i, j] != null && xlrange.Cells[i, j].value2 != null)
-                    //    console.writeline(xlrange.Cells[i, j].value2.toString());
+                for (int i = 2; i <= xlrange.Rows.Count; i++)
+                {
+                    for (int j = 1; j <= xlrange.Columns.Count; j++)
+                    {
+                        var contentObj = xlrange.Cells[i, j];
+                        var value = xlrange.Cells[i, j].value2;
+                        if (contentObj != null && value != null)
+                        {
+                            string header = xlrange.Cells[1, j].value2.ToString();
+                            header = header.Replace("\"", "");
+                            string currentCell = xlrange.Cells[i, j].value2.ToString();
+                            switch (header)
+                            {
+                                case "מספר זהות":
+                                    e.id = currentCell;
+                                    break;
+                                case "שם":
+                                    e.name = currentCell;
+                                    break;
+                                case "תפקיד":
+                                    Employee_Roles e_role = ConnectDB.entity.Employee_Roles.FirstOrDefault(x => x.Business_Id == business_id && x.Role == currentCell);
+                                    int role_id;
+                                    if (e_role != null)//תפקיד נמצא
+                                        e.role_id = e_role.ID;
+                                    else
+                                    {
+                                        ConnectDB.entity.Employee_Roles.Add(Employee_RolesEntity.ConvertEntityToDB(new Employee_RolesEntity { business_id = business_id, role = currentCell, min_of_shift = 5 }));
+                                        ConnectDB.entity.SaveChanges();
+                                        role_id = ConnectDB.entity.Employee_Roles.ToList().Last().ID;
+                                        e.role_id = role_id;
+                                    }
+                                    break;
+                                case "כתובת דואל":
+                                    e.email = currentCell;
+                                    break;
+                                case "טלפון":
+                                    e.phone = currentCell;
+                                    break;
+                            }
+                        }
+                    }
+                    e.business_id = business_id;
+                    e.password = "123456";
+                    if(ConnectDB.entity.Employees.FirstOrDefault(x=>x.ID == e.id) == null)
+                        ConnectDB.entity.Employees.Add(EmployeesEntity.ConvertEntityToDB(e));
                 }
+                ConnectDB.entity.SaveChanges();
             }
-            //return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());    
+            catch { }
+            finally
+            {
+                xlworkbook.Close();
+            }
+            return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
         }
 
         //פונקציה לשליפת עובד ע"פ כתובת הדוא"ל שלו 

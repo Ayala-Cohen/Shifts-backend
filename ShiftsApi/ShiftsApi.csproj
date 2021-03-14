@@ -107,7 +107,6 @@
     <Compile Include="Controllers\RatingController.cs" />
     <Compile Include="Controllers\ShiftsController.cs" />
     <Compile Include="Controllers\Shifts_EmployeesController.cs" />
-    <Compile Include="Controllers\Shift_In_DaysController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

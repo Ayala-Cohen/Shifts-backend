@@ -8,6 +8,7 @@ using Entity;
 using BL;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.IO;
+using System.Web;
 
 namespace ShiftsApi.Controllers
 {
@@ -60,9 +61,22 @@ namespace ShiftsApi.Controllers
         //פונקציה לטעינת רשימת עובדים מקובץ אקסל
         [Route("ImportFromExcel/{business_id}")]
         [HttpPost]
-        public void ImportFromExcel(int business_id, [FromBody] Excel.Application application)
+        public List<EmployeesEntity> ImportFromExcel(int business_id)
         {
-            EmployeesBL.ImportFromExcel(business_id, application);
+            var httpRequest = HttpContext.Current.Request;
+            var postedFile = httpRequest.Files["employeesListXL"];
+            string filePath ="";
+            if (postedFile != null)
+            {
+                string name = postedFile.FileName;
+                name = name.Substring(0, name.IndexOf('.'));
+                var fileName = name + business_id.ToString() + Path.GetExtension(postedFile.FileName);
+                filePath = HttpContext.Current.Server.MapPath("~/Files/" + fileName);
+                if(!File.Exists(filePath))
+                    postedFile.SaveAs(filePath);
+            }
+
+            return EmployeesBL.ImportFromExcel(business_id,filePath );
         }
 
 
