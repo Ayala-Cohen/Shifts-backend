@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssigningBL.cs" />
     <Compile Include="BusinessBL.cs" />
     <Compile Include="ConstraintsBL.cs" />
     <Compile Include="DepartmentsBL.cs" />

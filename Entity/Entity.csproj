@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssigningEntity.cs" />
     <Compile Include="BusinessEntity.cs" />
     <Compile Include="ConstraintsEntity.cs" />
     <Compile Include="DapartmentsEntity.cs" />
@@ -60,6 +61,7 @@
     <Compile Include="Employee_RolseEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RatingEntity.cs" />
+    <Compile Include="Satisfaction_StatusEntity.cs" />
     <Compile Include="ShiftsEntity.cs" />
     <Compile Include="Shift_EmployeesEntity.cs" />
     <Compile Include="Shift_In_DayEntity.cs" />

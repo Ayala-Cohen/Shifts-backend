@@ -57,44 +57,43 @@ namespace BL
         }
 
         //פונקציה לקביעת דירוג סטטיטי עבור עובד
-        //change to type entity
-        public static List<Satisfaction_Status> updateStatus()
+        public static List<Satisfaction_StatusEntity> updateStatus()
         {
-            Satisfaction_Status s = new Satisfaction_Status();
+            Satisfaction_StatusEntity s = new Satisfaction_StatusEntity();
             foreach (var item in ConnectDB.entity.Rating)
             {
-                s.Employee_ID = item.Employee_ID;
+                s.employee_id = item.Employee_ID;
                 switch (item.Rating1)
                 {
                     case "לא יכול":
                         if (item.Shift_Approved == true)
-                            s.Satisfaction_Status1 = 4;
+                            s.satisfaction_status = 4;
                         else
-                            s.Satisfaction_Status1 = 1;
+                            s.satisfaction_status = 1;
                         break;
                     case "מעדיף שלא":
                         if (item.Shift_Approved == true)
-                            s.Satisfaction_Status1 = 3;
+                            s.satisfaction_status = 3;
                         else
-                            s.Satisfaction_Status1 = 2;
+                            s.satisfaction_status = 2;
                         break;
                     case "יכול":
                         if (item.Shift_Approved == true)
-                            s.Satisfaction_Status1 = 2;
+                            s.satisfaction_status = 2;
                         else
-                            s.Satisfaction_Status1 = 3;
+                            s.satisfaction_status = 3;
                         break;
                     case "מעדיף":
                         if (item.Shift_Approved == true)
-                            s.Satisfaction_Status1 = 1;
+                            s.satisfaction_status = 1;
                         else
-                            s.Satisfaction_Status1 = 4;
+                            s.satisfaction_status = 4;
                         break;
                 }
-                ConnectDB.entity.Satisfaction_Status.Add(s);
+                ConnectDB.entity.Satisfaction_Status.Add(Satisfaction_StatusEntity.ConvertEntityToDB(s));
                 ConnectDB.entity.SaveChanges();
             }
-            return ConnectDB.entity.Satisfaction_Status.ToList();
+            return Satisfaction_StatusEntity.ConvertListDBToListEntity(ConnectDB.entity.Satisfaction_Status.ToList());
         }
     }
 }
