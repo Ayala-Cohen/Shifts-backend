@@ -75,7 +75,6 @@ namespace ShiftsApi.Controllers
                 if(!File.Exists(filePath))
                     postedFile.SaveAs(filePath);
             }
-
             return EmployeesBL.ImportFromExcel(business_id,filePath );
         }
 

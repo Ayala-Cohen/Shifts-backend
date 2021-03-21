@@ -19,7 +19,8 @@ namespace BL
         //פונקציה לשליפת רשימת מחלקות
         public static List<DepartmentsEntity> GetAllDepartments(int business_id)
         {
-            List<DepartmentsEntity> l_departments = DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.Where(x => x.Business_Id == business_id).ToList());
+            var l = ConnectDB.entity.Departments.Where(x => x.Business_Id == business_id).ToList();
+            List<DepartmentsEntity> l_departments = DepartmentsEntity.ConvertListDBToListEntity(l);
             return l_departments;
         }
 

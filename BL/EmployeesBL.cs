@@ -80,7 +80,7 @@ namespace BL
                 return EmployeesEntity.ConvertDBToEntity(e);
             return null;
         }
-
+        //פונקציה להכנסת נתוני עובדים מקובץ אקסל
         public static List<EmployeesEntity> ImportFromExcel(int business_id, string filePath)
         {
             EmployeesEntity e = new EmployeesEntity();
@@ -192,6 +192,7 @@ namespace BL
             }
 
             int max, index;
+            bool is_found;
             var grouped_by_shift = ConnectDB.entity.Rating.GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);
             Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = new Dictionary<int, Dictionary<string, IGrouping<string, Rating>>>();
             foreach (var item in grouped_by_shift)
@@ -201,26 +202,37 @@ namespace BL
             }
             foreach (var item in dic_shift_rating[shift_in_day_id])//בדיקה לגבי המשמרת הספציפית
             {
+                is_found = false;
                 if (item.Value.Count() != 0) //רשימה לא ריקה
                 {
                     if (item.Key == "מעדיף" || item.Key == "יכול")
                         index = 3;
                     else
                         index = 0;
-                    //שליפת העובדים שמופיעים תחת דירוג מסוים מתוך המילון
-                    var specific = d.Where(x => item.Value.Any(y => y.Employee_ID == x.Key));
-                    //מציאת הדירוג הסטטיסטי הנמוך או הגבוה - תלוי לפי המיקום שנקבע למעלה
-                    max = specific.Max(x => x.Value[index]);
-                    string id = d.FirstOrDefault(x => x.Value[index] == max).Key;
-                    string day = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Day;
-                    int shift_id = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Shift_ID;
-                    bool is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault(x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
-                    if (GetEmployeesToAssigning()[id] != 0 && !is_has_constaint) //עדיין לא שובץ בכל המשמרות שעליו לבצע ואין לו אילוץ קבוע במשמרת זו
-                        return EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id));
+                    while (!is_found)
+                    {
+                        //שליפת העובדים שמופיעים תחת דירוג מסוים מתוך המילון
+                        var specific = d.Where(x => item.Value.Any(y => y.Employee_ID == x.Key));
+                        //מציאת הדירוג הסטטיסטי הנמוך או הגבוה - תלוי לפי המיקום שנקבע למעלה
+                        max = specific.Max(x => x.Value[index]);
+                        //בדיקה שלעובד אין שיבוץ קבוע במשמרת מסוימת
+                        string id = d.FirstOrDefault(x => x.Value[index] == max).Key;
+                        string day = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Day;
+                        int shift_id = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Shift_ID;
+                        bool is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault(x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
+
+                        if (GetEmployeesToAssigning()[id] != 0 && !is_has_constaint) //עדיין לא שובץ בכל המשמרות שעליו לבצע ואין לו אילוץ קבוע במשמרת זו
+                            return EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id));
+                    }
                 }
             }
             return null;
         }
-
+        //פונקציה לבדיקה האם עובד משובץ כבר במשמרת מסוימת
+        public static bool checkIfAssignedInShift(int shift_in_day_id, string employee_id)
+        {
+            //לשנות בהתאם לאוסף המקומי
+            return ConnectDB.entity.Assigning.Any(x => x.Employee_ID == employee_id && x.Shift_In_Day_ID == shift_in_day_id);
+        }
     }
 }

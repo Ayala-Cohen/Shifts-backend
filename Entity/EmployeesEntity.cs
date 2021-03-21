@@ -30,8 +30,6 @@ namespace Entity
             return new Employees () { ID = e.id, Name = e.name, Password = e.password, Role_Id = e.role_id, Email = e.email, Business_Id = e.business_id, Phone = e.phone };
         }
 
-
-
         //המרת רשימה מסוג המסד לרשימה מסוג המחלקה
         public static List<EmployeesEntity> ConvertListDBToListEntity(List<Employees > l)
         {
