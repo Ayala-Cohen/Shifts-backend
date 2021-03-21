@@ -16,6 +16,7 @@ namespace ShiftsApi.Controllers
         [Route("GetAssigning/{business_id}")]
         public List<AssigningEntity> GetAssigning(int business_id)
         {
+            AssigningBL.AssigningActivity(business_id);
             return AssigningBL.GetAssigning(business_id);
         }
     }

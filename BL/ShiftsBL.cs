@@ -18,6 +18,12 @@ namespace BL
                 return ShiftsEntity.ConvertDBToEntity(s);
             return null;
         }
+        //פונקציה לשליפת משמרת ליום
+        public static int GetShiftInDayId(int shift_id, string day)
+        {
+            return ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Shift_ID == shift_id && x.Day == day).ID;
+        }
+
         //פונקציה לשליפת רשימת משמרות    
         public static List<ShiftsEntity> GetAllShifts(int business_id)
         {

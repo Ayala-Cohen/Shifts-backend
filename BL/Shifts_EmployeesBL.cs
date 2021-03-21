@@ -51,5 +51,14 @@ namespace BL
             ConnectDB.entity.SaveChanges();
             return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == s.business_id).ToList());
         }
+
+        //פונקציה לשליפת תפקידי עובדים במשמרת בודדת
+        public static List<Shift_EmployeesEntity> GetRolesForSpecificShift(int business_id, int shift_in_day_id, int department_id)
+        {
+            var day = ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.ID == shift_in_day_id).Day;
+            var shift = ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.ID == shift_in_day_id).Shift_ID;
+            var l = GetAllEmployeesShifts(business_id).Where(x => x.department_id == department_id && day == x.day && x.shift_id == shift).ToList();
+            return l;
+        }
     }
 }

@@ -45,14 +45,15 @@ namespace BL
         //פונקציה להוספת דירוג
         public static List<RatingEntity> AddRating(RatingEntity r, string day)
         {
-            //try
-            //{
+            try
+            {
                 int s_in_day_id = ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Day == day && x.Shift_ID == r.shift_id).ID;
                 r.shift_in_day = s_in_day_id;
-                ConnectDB.entity.Rating.Add(RatingEntity.ConvertEntityToDB(r));
+                Rating r_db = RatingEntity.ConvertEntityToDB(r);
+                ConnectDB.entity.Rating.Add(r_db);
                 ConnectDB.entity.SaveChanges();
-            //}
-            //catch { }
+            }
+            catch { }
             return RatingEntity.ConvertListDBToListEntity(ConnectDB.entity.Rating.ToList());
         }
 

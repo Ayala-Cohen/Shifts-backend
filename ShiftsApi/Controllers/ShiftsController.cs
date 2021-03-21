@@ -27,6 +27,14 @@ namespace ShiftsApi.Controllers
         {
             return ShiftsBL.GetShiftById(id);
         }
+
+        [Route("GetShiftInDayId/{shift_id}/{day}")]
+        [HttpGet]
+        //פונקציה לשליפת משמרת ליום
+        public int GetShiftInDayId(int shift_id, string day)
+        {
+            return ShiftsBL.GetShiftInDayId(shift_id, day);
+        }
         //פונקציה למחיקת משמרת
         [Route("DeleteShift/{id}")]
         [HttpDelete]
