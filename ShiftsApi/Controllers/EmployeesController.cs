@@ -22,13 +22,20 @@ namespace ShiftsApi.Controllers
         {
             return EmployeesBL.GetAllEmployees(business_id);
         }
-
         //פונקציה להחזרת עובד ע"י מספר זהות
         [Route("GetEmployeeById/{id}")]
         [HttpGet]
         public EmployeesEntity GetEmployeeById(string id)
         {
             return EmployeesBL.GetEmployeeById(id);
+        }
+
+        //פונקציה להחזרת רשימת מחלקות בהן העובד עובד
+        [Route("GetDepartmentsForEmployee/{id}")]
+        [HttpGet]
+        public List<DepartmentsEntity> GetDepartmentsForEmployee(string id)
+        {
+            return EmployeesBL.GetDepartmentsForEmployee(id);
         }
         //פונקציה למחיקת עובד
         [Route("DeleteEmployee/{id}")]
@@ -58,6 +65,14 @@ namespace ShiftsApi.Controllers
         {
             return EmployeesBL.CheckEmployee(email, password);
         }
+
+        [Route("AddDepartmentsForEmployee/{id}")]
+        [HttpPost]
+        //פונקציה להוספת מחלקות לעובד
+        public void AddDepartmentsForEmployee(string id, [FromBody] List<DepartmentsEntity> l)
+        {
+            EmployeesBL.AddDepartmentsForEmployee(l, id);
+        }
         //פונקציה לטעינת רשימת עובדים מקובץ אקסל
         [Route("ImportFromExcel/{business_id}")]
         [HttpPost]
@@ -80,9 +95,9 @@ namespace ShiftsApi.Controllers
 
 
         //פונקציה לשליפת עובד ע"פ כתובת הדוא"ל שלו 
-        [Route("GetEmployeeByEmail")]
-        [HttpPost]
-        public EmployeesEntity GetEmployeeByEmail([FromBody] string email)
+        [Route("GetEmployeeByEmail/{email}")]
+        [HttpGet]
+        public EmployeesEntity GetEmployeeByEmail(string email)
         {
             return EmployeesBL.GetEmployeeByEmail(email);
         }

@@ -56,6 +56,7 @@ namespace BL
             Shifts shift_for_deleting = ConnectDB.entity.Shifts.First(x => x.ID == id);
             int business_id = shift_for_deleting.Business_Id;
             ConnectDB.entity.Shifts.Remove(shift_for_deleting);
+            ConnectDB.entity.SaveChanges();
             return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id == business_id).ToList());
         }
         //פונקציה לעדכון משמרת

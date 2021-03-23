@@ -32,9 +32,18 @@ namespace BL
             {
                 ConnectDB.entity.Shift_Employees.Remove(item);
             }
+            foreach (var item in ConnectDB.entity.Assigning.Where(x=>x.Department_ID == id))
+            {
+                ConnectDB.entity.Assigning.Remove(item);
+            }
+            foreach (var item in ConnectDB.entity.Employees.Where(x=>x.Departments.Any(y=>y.ID == id)))
+            {
+                item.Departments.Clear();
+            }
             Departments d_for_deleting = ConnectDB.entity.Departments.First(x => x.ID == id);
             int business_id = d_for_deleting.Business_Id;
             ConnectDB.entity.Departments.Remove(d_for_deleting);
+            ConnectDB.entity.SaveChanges();
             return DepartmentsEntity.ConvertListDBToListEntity(ConnectDB.entity.Departments.Where(x => x.Business_Id == business_id).ToList());
         }
         //פונקציה לעדכון מחלקה
