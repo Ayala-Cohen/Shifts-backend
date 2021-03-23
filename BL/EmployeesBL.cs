@@ -14,6 +14,8 @@ namespace BL
 {
     public class EmployeesBL
     {
+
+
         //פונקציה לשליפת עובד בודד על פי קוד
         public static EmployeesEntity GetEmployeeById(string id)
         {
@@ -294,13 +296,7 @@ namespace BL
             string id, day;
             Dictionary<string, Dictionary<int, int>> d = AssigningBL.dic_of_satisfaction;//מילון שביעות רצון
             var grouped_by_shift = ConnectDB.entity.Rating.GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
-            Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = new Dictionary<int, Dictionary<string, IGrouping<string, Rating>>>();//מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
-            //יצירת מילון שיכיל כמפתח קוד משמרת ולכל משמרת יישמר מילון של הדירוגים מקובץ לפי דירוג
-            foreach (var item in grouped_by_shift)
-            {
-                var grouped_by_rating = item.Value.GroupBy(x => x.Rating1).ToDictionary(x => x.Key);
-                dic_shift_rating.Add(item.Key, grouped_by_rating);
-            }
+            Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = AssigningBL.dic_shift_rating;//מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
             var dic_of_shift = OrderByRating(dic_shift_rating[shift_in_day_id]);
             foreach (var item in dic_of_shift)//בדיקה לגבי המשמרת הספציפית
             {
@@ -341,4 +337,5 @@ namespace BL
             return AssigningBL.currentAssigning.Any(x => x.employee_id == employee_id && x.shift_in_day_id == shift_in_day_id);
         }
     }
+
 }
