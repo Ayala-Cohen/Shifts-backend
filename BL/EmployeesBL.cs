@@ -193,13 +193,20 @@ namespace BL
             }
             return d;
         }
-
+        //פונקציה לבדיקה האם עובד משובץ בכל המשמרות שעליו לבצע
+        public static bool CheckIfAssignedInAllShifts(string id)
+        {
+            EmployeesEntity e = GetEmployeeById(id);
+            int num_for_performing = Employees_RoleBL.GetEmployeeRoleById(e.role_id).min_of_shift;
+            int num_assigned = AssigningBL.currentAssigning.Where(x => x.employee_id == id).Count();//שליפת מספר הפעמים בהם משובץ העובד
+            return num_assigned == num_for_performing;
+        }
         //פונקציית עזר - יצירת מילון עבור דירוג סטטיסטי
         public static Dictionary<string, Dictionary<int, int>> CreateDictionaryOfSatisfaction(int business_id)
         {
+            //פונקציה ליצירת מילון המכיל כמפתח קוד עובד ועבור כל עובד את השכיחות של כל דירוג סטטיסטי
             Dictionary<string, Dictionary<int, int>> d = new Dictionary<string, Dictionary<int, int>>();
             Dictionary<int, int> dic;
-            //יצירת מילון המכיל כמפתח קוד עובד ועבור כל עובד את השכיחות של כל דירוג סטטיסטי
             //רשימת העובדים בעסק ספציפי
             var employees_of_business = ConnectDB.entity.Satisfaction_Status.Where(x => ConnectDB.entity.Employees.FirstOrDefault(y => y.ID == x.Employee_ID).Business_Id == business_id);
             var grouped_list = employees_of_business.GroupBy(x => x.Employee_ID);//קיבוץ לפי קוד עובד
@@ -231,7 +238,7 @@ namespace BL
             return ordered_dic;
         }
         //פונקציה להחזרת העובד האופטימלי לשיבוץ
-        public static List<EmployeesEntity> GetOptimalEmployee(int shift_in_day_id, int role_id, int min_for_perfoming)
+        public static List<EmployeesEntity> GetOptimalEmployee(int shift_in_day_id, int role_id, int min_for_perfoming, bool is_last_option)
         {
             #region oneEmployee
             //:מציאת העובד האופטימלי לשיבוץ מתנהל בצורה כזו
@@ -310,20 +317,23 @@ namespace BL
                     key = 1;
                 if (specific.Count() != 0)//כאשר ישנם עובדים מאותו התפקיד תחת אותו הדירוג
                 {
-                    l_suitable = d.Where(x => specific.Any(y => y.Key == x.Key)).OrderByDescending(x => x.Value[key]).ToDictionary(x => x.Key);
-                    foreach (var employee in l_suitable)
+                    if (key == 4 || is_last_option)//שיבוץ קודם כל של אלו שיכולים ומעדיפים ואם אין אופציה אחרת נשבץ גם את אלו בדירוגים הנמוכים יותר
                     {
-                        id = employee.Key;//מספר הזהות של העובד האופטימלי לשיבוץ הנוכחי
-                        day = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Day;//היום לגביו מתבצעת הבדיקה
-                        shift_id = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Shift_ID;//המשמרת לגביה מתבצעת הבדיקה
-                        //בדיקה האם לעובד זה יש אילוץ קבוע במשמרת זו
-                        is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault(x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
-                        //עדיין לא שובץ בכל המשמרות שעליו לבצע ואין לו אילוץ קבוע במשמרת זו וכן שהוא לא משובץ כבר במשמרת זו 
-                        if (GetEmployeesToAssigning()[id] != 0 && !is_has_constaint && !checkIfAssignedInShift(shift_in_day_id, id))
+                        l_suitable = d.Where(x => specific.Any(y => y.Key == x.Key)).OrderByDescending(x => x.Value[key]).ToDictionary(x => x.Key);
+                        foreach (var employee in l_suitable)
                         {
-                            l.Add(EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id)));//הוספה לרשימה הסופית של העובדים האופטימליים
-                            if (l.Count() == min_for_perfoming)//כאשר נמצאו מספר עובדים מתאימים לפי מספר העובדים הנדרשים למשמרת זו מאותו התפקיד
-                                return l;
+                            id = employee.Key;//מספר הזהות של העובד האופטימלי לשיבוץ הנוכחי
+                            day = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Day;//היום לגביו מתבצעת הבדיקה
+                            shift_id = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Shift_ID;//המשמרת לגביה מתבצעת הבדיקה
+                                                                                                                    //בדיקה האם לעובד זה יש אילוץ קבוע במשמרת זו
+                            is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault(x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
+                            //עדיין לא שובץ בכל המשמרות שעליו לבצע ואין לו אילוץ קבוע במשמרת זו וכן שהוא לא משובץ כבר במשמרת זו 
+                            if (!CheckIfAssignedInAllShifts(id)  && !is_has_constaint && !CheckIfAssignedInShift(shift_in_day_id, id))
+                            {
+                                l.Add(EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id)));//הוספה לרשימה הסופית של העובדים האופטימליים
+                                if (l.Count() == min_for_perfoming)//כאשר נמצאו מספר עובדים מתאימים לפי מספר העובדים הנדרשים למשמרת זו מאותו התפקיד
+                                    return l;
+                            }
                         }
                     }
                 }
@@ -332,7 +342,7 @@ namespace BL
             #endregion
         }
         //פונקציה לבדיקה האם עובד משובץ כבר במשמרת מסוימת
-        public static bool checkIfAssignedInShift(int shift_in_day_id, string employee_id)
+        public static bool CheckIfAssignedInShift(int shift_in_day_id, string employee_id)
         {
             return AssigningBL.currentAssigning.Any(x => x.employee_id == employee_id && x.shift_in_day_id == shift_in_day_id);
         }

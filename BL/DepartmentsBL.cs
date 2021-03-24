@@ -77,10 +77,11 @@ namespace BL
             //שליפת משמרות לפי מחלקה
             List<Shift_Employees> l = ConnectDB.entity.Shift_Employees.Where(x => x.Departments_Id == d_id).ToList();
             List<Shift_In_DayEntity> l_shifts = new List<Shift_In_DayEntity>();
+            var l_shift_day = l.Select(x => new { shift_id = x.Shift_ID, day = x.Day }).ToList();
             //המרה לסוג של טבלת משמרות ליום
-            foreach (var item in l.Select(x => new { shift_id = x.Shift_ID, day = x.Day }).ToList())
+            foreach (var item in l_shift_day)
             {
-                l_shifts.Add(Shift_In_DayEntity.ConvertDBToEntity(ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Shift_ID == item.shift_id)));
+                l_shifts.Add(Shift_In_DayEntity.ConvertDBToEntity(ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Shift_ID == item.shift_id && x.Day == item.day)));
             }
             return l_shifts;
 
