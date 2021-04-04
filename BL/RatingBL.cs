@@ -16,10 +16,13 @@ namespace BL
             RatingEntity r = RatingEntity.ConvertDBToEntity(ConnectDB.entity.Rating.First(x => x.Employee_ID == e_id && x.Shift_In_Day == s_in_day));
             return r;
         }
-        //פונקציה לשליפת רשימת דירוגים
-        public static List<RatingEntity> GetAllRating()
+        //פונקציה לשליפת רשימת דירוגים של עובד מסוים
+        public static List<RatingEntity> GetAllRating(string employee_id)
         {
-            List<RatingEntity> l_rating = RatingEntity.ConvertListDBToListEntity(ConnectDB.entity.Rating.ToList());
+            var l_rating_db = ConnectDB.entity.Rating.Where(x => x.Employee_ID == employee_id).ToList();
+            List<RatingEntity> l_rating = null;
+            if (l_rating_db.Count() != 0)
+                l_rating  = RatingEntity.ConvertListDBToListEntity(l_rating_db).ToList();
             return l_rating;
         }
 

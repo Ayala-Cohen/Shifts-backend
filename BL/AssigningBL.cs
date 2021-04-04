@@ -63,6 +63,10 @@ namespace BL
             AssigningEntity earlier_assigning;
             List<AssigningEntity> local_assigning = new List<AssigningEntity>();
             List<EmployeesEntity> l_employees_of_business = EmployeesBL.GetAllEmployees(business_id);
+            foreach (var item in l_employees_of_business)
+            {
+                EmployeesBL.CompleteRatingOfAllShifts(item.id);
+            }
             var list_departments = DepartmentsBL.GetAllDepartments(business_id);//רשימת המחלקות בעסק
             foreach (var dep in list_departments)//מעבר על רשימת המחלקות
             {
@@ -132,6 +136,7 @@ namespace BL
             {
                 if (!EmployeesBL.CheckIfAssignedInAllShifts(item.id))
                     break;//לטפל בצורה אחרת
+                //?מקרה קצה בו העובד אינו יכול לבצע את כל המשמרות שבהן מחויב - מה לעשות
             }
             //בסיום השיבוץ - הכנסת הנתונים לדאטה בייס
             foreach (var item in currentAssigning)

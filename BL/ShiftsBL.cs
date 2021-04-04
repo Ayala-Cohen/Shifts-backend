@@ -14,21 +14,30 @@ namespace BL
         public static ShiftsEntity GetShiftById(int id)
         {
             Shifts s = ConnectDB.entity.Shifts.First(x => x.ID == id);
-            if (s!= null)
+            if (s != null)
                 return ShiftsEntity.ConvertDBToEntity(s);
             return null;
         }
         //פונקציה לשליפת משמרת ליום
         public static int GetShiftInDayId(int shift_id, string day)
         {
-            return ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Shift_ID == shift_id && x.Day == day).ID;
+            try
+            {
+                var shift_in_day = ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Shift_ID == shift_id && x.Day == day);
+                if (shift_in_day != null)
+                    return shift_in_day.ID;
+            }
+            catch (Exception)
+            {
+            }
+            return 0;
         }
 
         //פונקציה לשליפת רשימת משמרות    
         public static List<ShiftsEntity> GetAllShifts(int business_id)
         {
             List<Shifts> l_shifts = ConnectDB.entity.Shifts.Where(x => x.Business_Id == business_id).ToList();
-            if(l_shifts != null)
+            if (l_shifts != null)
                 return ShiftsEntity.ConvertListDBToListEntity(l_shifts);
             return null;
         }
@@ -41,15 +50,15 @@ namespace BL
             {
                 ConnectDB.entity.Shifts_In_Days.Remove(item);
             }
-            foreach (var item in ConnectDB.entity.Constraints.Where(x=>x.Shift_ID == id))
+            foreach (var item in ConnectDB.entity.Constraints.Where(x => x.Shift_ID == id))
             {
                 ConnectDB.entity.Constraints.Remove(item);
             }
-            foreach (var item in ConnectDB.entity.Shift_Employees.Where(x=>x.Shift_ID == id))
+            foreach (var item in ConnectDB.entity.Shift_Employees.Where(x => x.Shift_ID == id))
             {
                 ConnectDB.entity.Shift_Employees.Remove(item);
             }
-            foreach (var item in ConnectDB.entity.Rating.Where(x=>x.Shift_Id==id))
+            foreach (var item in ConnectDB.entity.Rating.Where(x => x.Shift_Id == id))
             {
                 ConnectDB.entity.Rating.Remove(item);
             }
@@ -57,7 +66,7 @@ namespace BL
             int business_id = shift_for_deleting.Business_Id;
             ConnectDB.entity.Shifts.Remove(shift_for_deleting);
             ConnectDB.entity.SaveChanges();
-            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id == business_id).ToList());
+            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x => x.Business_Id == business_id).ToList());
         }
         //פונקציה לעדכון משמרת
         public static List<ShiftsEntity> UpdateShift(ShiftsEntity s)
@@ -65,7 +74,7 @@ namespace BL
             Shifts shift_for_updating = ConnectDB.entity.Shifts.First(x => x.ID == s.id);
             shift_for_updating.Name = s.name;
             ConnectDB.entity.SaveChanges();
-            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id == s.business_id).ToList());
+            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x => x.Business_Id == s.business_id).ToList());
         }
 
 
@@ -86,7 +95,7 @@ namespace BL
             }
             catch { }
 
-            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x=>x.Business_Id==s.business_id).ToList());
+            return ShiftsEntity.ConvertListDBToListEntity(ConnectDB.entity.Shifts.Where(x => x.Business_Id == s.business_id).ToList());
         }
 
     }

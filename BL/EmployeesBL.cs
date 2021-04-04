@@ -307,7 +307,6 @@ namespace BL
             var dic_of_shift = OrderByRating(dic_shift_rating[shift_in_day_id]);
             foreach (var item in dic_of_shift)//בדיקה לגבי המשמרת הספציפית
             {
-
                 //שליפת העובדים שמופיעים תחת הדירוג הנוכחי מתוך המילון
                 var specific = d.Where(x => item.Value.Any(y => y.Employee_ID == x.Key) && GetEmployeeById(x.Key).role_id == role_id);
 
@@ -346,6 +345,29 @@ namespace BL
         {
             return AssigningBL.currentAssigning.Any(x => x.employee_id == employee_id && x.shift_in_day_id == shift_in_day_id);
         }
+        //פונקציה להשלמת דירוגים אם לעובד אין דירוג על כל המשמרות הפעילות בעסק
+        public static void CompleteRatingOfAllShifts(string employee_id)
+        {
+            var e = GetEmployeeById(employee_id);
+            var l_rating = RatingBL.GetAllRating(employee_id);
+            var l_active_shifts = Shifts_EmployeesBL.GetActiveShifts(e.business_id);
+            if(l_active_shifts.Count != l_rating.Count)
+            {
+                while(l_rating.Count < l_active_shifts.Count)
+                {
+                    foreach (var item in l_active_shifts)
+                    {
+                        if(!l_rating.Any(x=>x.shift_in_day == item.id))
+                        {
+                            RatingEntity r = new RatingEntity() { employee_id = employee_id, rating = "יכול", shift_in_day = item.id, shift_approved = false , shift_id = item.shift_id};
+                            RatingBL.AddRating(r, item.day);
+                            l_rating = RatingBL.GetAllRating(employee_id);
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
 }

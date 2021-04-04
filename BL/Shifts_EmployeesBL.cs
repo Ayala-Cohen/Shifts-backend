@@ -15,14 +15,14 @@ namespace BL
         {
 
             Shift_Employees s = ConnectDB.entity.Shift_Employees.FirstOrDefault(x => x.Shift_ID == s_id && x.Role_Id == r_id && x.Day == day);
-            if(s!=null)
+            if (s != null)
                 return Shift_EmployeesEntity.ConvertDBToEntity(s);
             return null;
         }
         //פונקציה לשליפת רשימת עובדים במשמרות
         public static List<Shift_EmployeesEntity> GetAllEmployeesShifts(int business_id)
         {
-            List<Shift_EmployeesEntity> l_employees_in_shifts = Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == business_id).ToList());
+            List<Shift_EmployeesEntity> l_employees_in_shifts = Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x => x.Business_Id == business_id).ToList());
             return l_employees_in_shifts;
         }
 
@@ -32,7 +32,7 @@ namespace BL
             Shift_Employees employee_shift_for_deleting = ConnectDB.entity.Shift_Employees.First(x => x.Shift_ID == s_id && x.Role_Id == r_id && x.Day == day);
             int business_id = employee_shift_for_deleting.Business_Id;
             ConnectDB.entity.Shift_Employees.Remove(employee_shift_for_deleting);
-            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == business_id).ToList());
+            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x => x.Business_Id == business_id).ToList());
         }
         //פונקציה לעדכון עובד במשמרת
         public static List<Shift_EmployeesEntity> UpdateEmployeeShift(Shift_EmployeesEntity s)
@@ -40,16 +40,22 @@ namespace BL
             Shift_Employees employee_in_shift_for_updating = ConnectDB.entity.Shift_Employees.First(x => x.Shift_ID == s.shift_id);
             employee_in_shift_for_updating.Number_Of_Shift_Employees = s.number_of_shift_employees;
             ConnectDB.entity.SaveChanges();
-            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == s.business_id).ToList());
+            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x => x.Business_Id == s.business_id).ToList());
         }
 
 
         //פונקציה להוספת עובד במשמרת
         public static List<Shift_EmployeesEntity> AddEmployeeShift(Shift_EmployeesEntity s)
         {
-            ConnectDB.entity.Shift_Employees.Add(Shift_EmployeesEntity.ConvertEntityToDB(s));
-            ConnectDB.entity.SaveChanges();
-            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x=>x.Business_Id == s.business_id).ToList());
+            try
+            {
+                ConnectDB.entity.Shift_Employees.Add(Shift_EmployeesEntity.ConvertEntityToDB(s));
+                ConnectDB.entity.SaveChanges();
+            }
+            catch (Exception)
+            {
+            }
+            return Shift_EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Shift_Employees.Where(x => x.Business_Id == s.business_id).ToList());
         }
 
         //פונקציה לשליפת תפקידי עובדים במשמרת בודדת
@@ -59,6 +65,15 @@ namespace BL
             var shift = ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.ID == shift_in_day_id).Shift_ID;
             var l = GetAllEmployeesShifts(business_id).Where(x => x.department_id == department_id && day == x.day && x.shift_id == shift).ToList();
             return l;
+        }
+
+        //פונקציה לשליפת משמרות פעילות במחלקה
+        public static List<Shift_In_DayEntity> GetActiveShifts(int business_id)
+        {
+            var l = GetAllEmployeesShifts(business_id).Select(x => new { shift_id = x.shift_id, day = x.day }).Distinct();
+            List<Shifts_In_Days> l_shifts_db = ConnectDB.entity.Shifts_In_Days.Where(x => l.Any(y => y.day == x.Day && y.shift_id == x.Shift_ID)).ToList();
+            List<Shift_In_DayEntity> l_shifts = Shift_In_DayEntity.ConvertListDBToListEntity(l_shifts_db);
+            return l_shifts;
         }
     }
 }

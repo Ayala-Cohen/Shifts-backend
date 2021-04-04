@@ -12,12 +12,12 @@ namespace ShiftsApi.Controllers
     [RoutePrefix("api/Rating")]
     public class RatingController : ApiController
     {
-        //פונקציה להחזרת רשימת דירוגים
-        [Route("GetAllRatings")]
+        //פונקציה להחזרת רשימת דירוגים של עובד מסוים
+        [Route("GetAllRatings/{employee_id}")]
         [HttpGet]
-        public List<RatingEntity> GetAllRatings()
+        public List<RatingEntity> GetAllRatings(string employee_id)
         {
-            return RatingBL.GetAllRating();
+            return RatingBL.GetAllRating(employee_id);
         }
 
         //פונקציה להחזרת דירוג ע"י קוד
