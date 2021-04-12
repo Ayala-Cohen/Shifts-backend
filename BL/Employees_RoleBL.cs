@@ -13,8 +13,16 @@ namespace BL
         //פונקציה לשליפת תפקיד בודד על פי קוד
         public static Employee_RolesEntity GetEmployeeRoleById(int id)
         {
-            Employee_RolesEntity e = Employee_RolesEntity.ConvertDBToEntity(ConnectDB.entity.Employee_Roles.First(x => x.ID == id));
-            return e;
+            try
+            {
+                Employee_RolesEntity e = Employee_RolesEntity.ConvertDBToEntity(ConnectDB.entity.Employee_Roles.First(x => x.ID == id));
+                return e;
+            }
+            catch (Exception)
+            {
+
+            }
+            return null;
         }
         //פונקציה לשליפת רשימת תפקידי עובדים
         public static List<Employee_RolesEntity> GetAllEmployeesRoles(int business_id)

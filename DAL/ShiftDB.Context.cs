@@ -12,6 +12,8 @@ namespace DAL
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
     
     public partial class ShiftEntities : DbContext
     {
@@ -36,5 +38,18 @@ namespace DAL
         public virtual DbSet<Shift_Employees> Shift_Employees { get; set; }
         public virtual DbSet<Shifts> Shifts { get; set; }
         public virtual DbSet<Shifts_In_Days> Shifts_In_Days { get; set; }
+    
+        public virtual int add_employee_in_department(string employee_id, Nullable<int> department_id)
+        {
+            var employee_idParameter = employee_id != null ?
+                new ObjectParameter("employee_id", employee_id) :
+                new ObjectParameter("employee_id", typeof(string));
+    
+            var department_idParameter = department_id.HasValue ?
+                new ObjectParameter("department_id", department_id) :
+                new ObjectParameter("department_id", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("add_employee_in_department", employee_idParameter, department_idParameter);
+        }
     }
 }

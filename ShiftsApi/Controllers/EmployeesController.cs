@@ -66,12 +66,12 @@ namespace ShiftsApi.Controllers
             return EmployeesBL.CheckEmployee(email, password);
         }
 
-        [Route("AddDepartmentsForEmployee/{id}")]
+        [Route("AddOrRemoveDepartmentsForEmployee/{id}")]
         [HttpPost]
         //פונקציה להוספת מחלקות לעובד
-        public void AddDepartmentsForEmployee(string id, [FromBody] List<DepartmentsEntity> l)
+        public void AddOrRemoveDepartmentsForEmployee(string id, [FromBody] List<DepartmentsEntity> l)
         {
-            EmployeesBL.AddDepartmentsForEmployee(l, id);
+            EmployeesBL.AddOrRemoveDepartmentsForEmployee(l, id);
         }
         //פונקציה לטעינת רשימת עובדים מקובץ אקסל
         [Route("ImportFromExcel/{business_id}")]
@@ -92,15 +92,5 @@ namespace ShiftsApi.Controllers
             }
             return EmployeesBL.ImportFromExcel(business_id,filePath );
         }
-
-
-        //פונקציה לשליפת עובד ע"פ כתובת הדוא"ל שלו 
-        [Route("GetEmployeeByEmail/{email}")]
-        [HttpGet]
-        public EmployeesEntity GetEmployeeByEmail(string email)
-        {
-            return EmployeesBL.GetEmployeeByEmail(email);
-        }
-
     }
 }

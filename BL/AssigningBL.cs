@@ -99,6 +99,7 @@ namespace BL
                                     {
                                         earlier_assigning = a;//שמירת הערך מרשימת השיבוץ המקומי למשתנה
                                         currentAssigning.Remove(a);//הסרתו מהרשימה
+                                        //להוסיף החלפה - רק אם יש עובד שמתאים לעבוד במשמרת שהוצאה להחליף
                                         UpdateShiftApproved(false, earlier_assigning.employee_id, shift.id);//עדכון שהמשמרת לא התקבלה בסופו של דבר
                                         l_employees = EmployeesBL.GetOptimalEmployee(shift.id, role.role_id, min_for_performing, is_last_option);//חיפוש לאחר השינוי
                                         len_of_optimal = l_employees.Count;
@@ -128,23 +129,46 @@ namespace BL
                             currentAssigning.Add(new AssigningEntity { department_id = dep.id, employee_id = e.id, shift_in_day_id = shift.id });
                             UpdateShiftApproved(true, e.id, shift.id);
                             //עדכון לטבלת שביעות רצון ע"מ שלא נתחשב פעמים באותו עובד
+                            //הוספה מקומית למילון - הגדלה של רמת השביעות רצון 
+                            //בסוף השיבוץ נכניס גם לדאטה בייס
+                            dic_of_satisfaction[e.id][1]++;
                         }
                     }
                 }
             }
             foreach (var item in l_employees_of_business)
             {
-                if (!EmployeesBL.CheckIfAssignedInAllShifts(item.id))
+                if (!EmployeesBL.CheckIfAssignedInAllShifts(item.id))//לנסות לנתח אם יכול לקרות
                     break;//לטפל בצורה אחרת
                 //?מקרה קצה בו העובד אינו יכול לבצע את כל המשמרות שבהן מחויב - מה לעשות
+                //לתת למנהל רשימה של עובדים שיכולים או מעדיפים על מנת שידע את מי להחליף
+                //ולבדוק שלא משובצים במחלקה אחרת
             }
             //בסיום השיבוץ - הכנסת הנתונים לדאטה בייס
             foreach (var item in currentAssigning)
             {
-                ConnectDB.entity.Assigning.Add(AssigningEntity.ConvertEntityToDB(item));
+                ConnectDB.entity.Assigning.Add(AssigningEntity.ConvertEntityToDB(item));//עדכון טבלת שיבוץ סופי
+                RatingBL.updateStatus();//עדכון טבלת שביעות רצון
             }
             ConnectDB.entity.SaveChanges();
             return GetAssigning(business_id);
+        }
+
+        //פונקציה לשליפת רשימת העובדים שיכולים או מעדיפים משמרת על מנת שהמנהל יוכל להחליף בצורה ידנית
+        public static List<EmployeesEntity> GetEmployeesWithHighRating(int business_id, int shift_id, int role_id)
+        {
+            List<EmployeesEntity> l_employees_of_business = EmployeesBL.GetAllEmployees(business_id);
+            List<EmployeesEntity> l_suitable = new List<EmployeesEntity>();
+            var dic_rating_can_prefere = dic_shift_rating[shift_id].Where(y => y.Key == "יכול" || y.Key == "מעדיף");//שליפת הדירוגים מעדיף ויכול למשמרת זו
+            foreach (var item in l_employees_of_business)
+            {
+                if (item.role_id == role_id && dic_rating_can_prefere.Where(x => x.Value.Any(y => y.Employee_ID == item.id)) != null) //בדיקה שהעובד אכן רוצה משמרת זו וכן שתפקידו זהה לתפקיד הנדרש
+                {
+                    if(!EmployeesBL.CheckIfAssignedInShift(shift_id, item.id))//בדיקה שלא משובץ כבר במשמרת אחרת
+                        l_suitable.Add(item);
+                }
+            }
+            return l_suitable;
         }
     }
 }

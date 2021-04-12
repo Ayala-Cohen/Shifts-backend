@@ -14,8 +14,6 @@ namespace BL
 {
     public class EmployeesBL
     {
-
-
         //פונקציה לשליפת עובד בודד על פי קוד
         public static EmployeesEntity GetEmployeeById(string id)
         {
@@ -78,20 +76,42 @@ namespace BL
         //פונקציה לשליפת המחלקות בהן עובד כל עובד
         public static List<DepartmentsEntity> GetDepartmentsForEmployee(string employee_id)
         {
-            Employees e = ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == employee_id);
-            List<DepartmentsEntity> l_departments = DepartmentsEntity.ConvertListDBToListEntity(e.Departments.ToList());
-            return l_departments;
+            try
+            {
+                Employees e = ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == employee_id);
+                if (e != null)
+                {
+                    if (e.Departments.Count != 0)
+                    {
+                        List<DepartmentsEntity> l_departments = DepartmentsEntity.ConvertListDBToListEntity(e.Departments.ToList());
+                        return l_departments;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+            }
+            return null;
         }
         //הוספת מחלקות לעובד
-        public static void AddDepartmentsForEmployee(List<DepartmentsEntity> l, string id)
+        public static void AddOrRemoveDepartmentsForEmployee(List<DepartmentsEntity> l, string id)
         {
             Employees e = ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id);
             List<Departments> l_departments = DepartmentsEntity.ConvertListEntityToListDB(l);
-            foreach (var item in l_departments)
+            if (l.Count() < l_departments.Count())//העובד כבר לא עובד במחלקה זו
             {
-                if (!e.Departments.Any(x => x.ID == item.ID))
-                    e.Departments.Add(item);
+                var l_departments_for_deleting = l_departments.Where(x => !l.Any(y => y.id == x.ID)).ToList();
+                foreach (var dep in l_departments_for_deleting)
+                {
+                    e.Departments.Remove(dep);
+                }
             }
+            else
+                foreach (var item in l_departments)
+                {
+                    if (!e.Departments.Any(x => x.ID == item.ID))
+                        ConnectDB.entity.add_employee_in_department(id, item.ID);
+                }
             ConnectDB.entity.SaveChanges();
         }
         //פונקציה לבדיקת פרטי עובד ע"י שם משתמש וסיסמה
@@ -171,14 +191,6 @@ namespace BL
             return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
         }
 
-        //פונקציה לשליפת עובד ע"פ כתובת הדוא"ל שלו 
-        public static EmployeesEntity GetEmployeeByEmail(string email)
-        {
-            Employees e = ConnectDB.entity.Employees.FirstOrDefault(x => x.Email == email);
-            if (e != null)
-                return EmployeesEntity.ConvertDBToEntity(e);
-            return null;
-        }
 
         //פונקציה להחזרת עובדים שאינם משובצים בכל המשמרות שעליהם לבצע
         public static Dictionary<string, int> GetEmployeesToAssigning()
@@ -327,7 +339,7 @@ namespace BL
                                                                                                                     //בדיקה האם לעובד זה יש אילוץ קבוע במשמרת זו
                             is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault(x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
                             //עדיין לא שובץ בכל המשמרות שעליו לבצע ואין לו אילוץ קבוע במשמרת זו וכן שהוא לא משובץ כבר במשמרת זו 
-                            if (!CheckIfAssignedInAllShifts(id)  && !is_has_constaint && !CheckIfAssignedInShift(shift_in_day_id, id))
+                            if (!CheckIfAssignedInAllShifts(id) && !is_has_constaint && !CheckIfAssignedInShift(shift_in_day_id, id))
                             {
                                 l.Add(EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id)));//הוספה לרשימה הסופית של העובדים האופטימליים
                                 if (l.Count() == min_for_perfoming)//כאשר נמצאו מספר עובדים מתאימים לפי מספר העובדים הנדרשים למשמרת זו מאותו התפקיד
@@ -351,16 +363,17 @@ namespace BL
             var e = GetEmployeeById(employee_id);
             var l_rating = RatingBL.GetAllRating(employee_id);
             var l_active_shifts = Shifts_EmployeesBL.GetActiveShifts(e.business_id);
-            if(l_active_shifts.Count != l_rating.Count)
+            if (l_active_shifts.Count != l_rating.Count)
             {
-                while(l_rating.Count < l_active_shifts.Count)
+                while (l_rating.Count < l_active_shifts.Count)
                 {
                     foreach (var item in l_active_shifts)
                     {
-                        if(!l_rating.Any(x=>x.shift_in_day == item.id))
+                        if (!l_rating.Any(x => x.shift_in_day == item.id))
                         {
-                            RatingEntity r = new RatingEntity() { employee_id = employee_id, rating = "יכול", shift_in_day = item.id, shift_approved = false , shift_id = item.shift_id};
+                            RatingEntity r = new RatingEntity() { employee_id = employee_id, rating = "יכול", shift_in_day = item.id, shift_approved = false, shift_id = item.shift_id };
                             RatingBL.AddRating(r, item.day);
+                            ConnectDB.entity.SaveChanges();
                             l_rating = RatingBL.GetAllRating(employee_id);
                         }
                     }
@@ -368,6 +381,27 @@ namespace BL
             }
         }
 
-    }
+        //פונקציה לשליחת אמייל , הפונקציה מקבלת את הנושא ואת המסר לשליחה
+        public static void SendEmailOfQuestion(List<EmployeesEntity> l, string subject, string message)
+        {
+            foreach (var item in l)
+            {
+                using (MailMessage mail = new MailMessage())
+                {
+                    mail.From = new MailAddress("shiftssystem98@gmail.com");
+                    mail.To.Add(item.email);
+                    mail.Subject = subject;
+                    mail.Body = message;
+                    mail.IsBodyHtml = true;
 
+                    using (SmtpClient smtp = new SmtpClient("smtp.gmail.com", 587))
+                    {
+                        smtp.Credentials = new NetworkCredential("shiftssystem98@gmail.com", "shs2021shs");
+                        smtp.EnableSsl = true;
+                        smtp.Send(mail);
+                    }
+                }
+            }
+        }
+    }
 }
