@@ -27,8 +27,15 @@ namespace BL
         //פונקציה לשליפת רשימת תפקידי עובדים
         public static List<Employee_RolesEntity> GetAllEmployeesRoles(int business_id)
         {
-            List<Employee_RolesEntity> l_employees_role = Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == business_id).ToList());
-            return l_employees_role;
+            try
+            {
+                List<Employee_RolesEntity> l_employees_role = Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == business_id).ToList());
+                return l_employees_role;
+            }
+            catch (Exception)
+            {
+            }
+            return null;
         }
 
         //פונקציה למחיקת תפקיד

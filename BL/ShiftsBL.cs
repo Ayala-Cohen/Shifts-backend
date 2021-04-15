@@ -36,10 +36,34 @@ namespace BL
         //פונקציה לשליפת רשימת משמרות    
         public static List<ShiftsEntity> GetAllShifts(int business_id)
         {
-            List<Shifts> l_shifts = ConnectDB.entity.Shifts.Where(x => x.Business_Id == business_id).ToList();
-            if (l_shifts != null)
+            try
+            {
+                List<Shifts> l_shifts = ConnectDB.entity.Shifts.Where(x => x.Business_Id == business_id).ToList();
                 return ShiftsEntity.ConvertListDBToListEntity(l_shifts);
-            return null;
+            }
+            catch (Exception)
+            {
+                return null;
+
+            }
+
+        }
+        //פונקציה להחזרת רשימת משמרות ליום
+        public static List<Shift_In_DayEntity> GetAllShiftsForDay(int business_id)
+        {
+            try
+            {
+                List<Shifts_In_Days> l = ConnectDB.entity.Shifts_In_Days.ToList();
+                List<ShiftsEntity> l_shifts = GetAllShifts(business_id);
+
+                l = l.Where(x => l_shifts.Any(y => y.id == x.Shift_ID) == true).ToList();
+                return Shift_In_DayEntity.ConvertListDBToListEntity(l);
+
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         //פונקציה למחיקת משמרת

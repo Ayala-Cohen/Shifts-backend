@@ -23,8 +23,15 @@ namespace BL
         //פונקציה לשליפת רשימת עובדים
         public static List<EmployeesEntity> GetAllEmployees(int business_id)
         {
-            List<EmployeesEntity> l_employees = EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
-            return l_employees;
+            try
+            {
+                List<EmployeesEntity> l_employees = EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
+                return l_employees;
+            }
+            catch (Exception)
+            {
+            }
+            return null;
         }
 
         //פונקציה למחיקת עובד
@@ -48,14 +55,21 @@ namespace BL
         //פונקציה לעדכון עובד
         public static List<EmployeesEntity> UpdateEmployee(EmployeesEntity e)
         {
-            Employees employee_for_updating = ConnectDB.entity.Employees.First(x => x.ID == e.id);
-            employee_for_updating.Email = e.email;
-            employee_for_updating.Name = e.name;
-            employee_for_updating.Password = e.password;
-            employee_for_updating.Role_Id = e.role_id;
-            employee_for_updating.Business_Id = e.business_id;
-            employee_for_updating.Phone = e.phone;
-            ConnectDB.entity.SaveChanges();
+            try
+            {
+                Employees employee_for_updating = ConnectDB.entity.Employees.First(x => x.ID == e.id);
+                employee_for_updating.Email = e.email;
+                employee_for_updating.Name = e.name;
+                employee_for_updating.Password = e.password;
+                employee_for_updating.Role_Id = e.role_id;
+                employee_for_updating.Business_Id = e.business_id;
+                employee_for_updating.Phone = e.phone;
+                ConnectDB.entity.SaveChanges();
+            }
+            catch (Exception)
+            {
+            }
+
             return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == e.business_id).ToList());
         }
 
@@ -94,13 +108,13 @@ namespace BL
             return null;
         }
         //הוספת מחלקות לעובד
-        public static void AddOrRemoveDepartmentsForEmployee(List<DepartmentsEntity> l, string id)
+        public static List<DepartmentsEntity> AddOrRemoveDepartmentsForEmployee(List<DepartmentsEntity> l, string id)
         {
             Employees e = ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id);
             List<Departments> l_departments = DepartmentsEntity.ConvertListEntityToListDB(l);
-            if (l.Count() < l_departments.Count())//העובד כבר לא עובד במחלקה זו
+            if (l.Count() < e.Departments.Count)//העובד כבר לא עובד במחלקה זו
             {
-                var l_departments_for_deleting = l_departments.Where(x => !l.Any(y => y.id == x.ID)).ToList();
+                var l_departments_for_deleting = e.Departments.Where(x => !l.Any(y => y.id == x.ID)).ToList();
                 foreach (var dep in l_departments_for_deleting)
                 {
                     e.Departments.Remove(dep);
@@ -113,6 +127,9 @@ namespace BL
                         ConnectDB.entity.add_employee_in_department(id, item.ID);
                 }
             ConnectDB.entity.SaveChanges();
+            if(e.Departments.Count != 0)
+                return DepartmentsEntity.ConvertListDBToListEntity(e.Departments.ToList());
+            return null;
         }
         //פונקציה לבדיקת פרטי עובד ע"י שם משתמש וסיסמה
         public static EmployeesEntity CheckEmployee(string email, string password)

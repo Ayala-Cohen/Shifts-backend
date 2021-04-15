@@ -14,14 +14,28 @@ namespace BL
         //פונקציה לשליפת עסק בודד על פי קוד
         public static BusinessEntity GetBusinessById(int id)
         {
-            BusinessEntity b = BusinessEntity.ConvertDBToEntity(ConnectDB.entity.Business.First(x => x.ID == id));
-            return b;
+            try
+            {
+                BusinessEntity b = BusinessEntity.ConvertDBToEntity(ConnectDB.entity.Business.First(x => x.ID == id));
+                return b;
+            }
+            catch (Exception)
+            {
+            }
+            return null;
         }
         //פונקציה לשליפת רשימת עסקים
         public static List<BusinessEntity> GetAllBusinesses()
         {
-            List<BusinessEntity> l_business = BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
-            return l_business;
+            try
+            {
+                List<BusinessEntity> l_business = BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
+                return l_business;
+            }
+            catch (Exception)
+            {
+            }
+            return null;
         }
 
         //פונקציה למחיקת עסק

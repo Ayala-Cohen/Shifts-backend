@@ -35,6 +35,13 @@ namespace ShiftsApi.Controllers
         {
             return ShiftsBL.GetShiftInDayId(shift_id, day);
         }
+        [Route("GetAllShiftsForDay/{business_id}")]
+        [HttpGet]
+        //פונקציה לשליפת רשימת משמרות ליום
+        public List<Shift_In_DayEntity> GetAllShiftsForDay(int business_id)
+        {
+            return ShiftsBL.GetAllShiftsForDay(business_id);
+        }
         //פונקציה למחיקת משמרת
         [Route("DeleteShift/{id}")]
         [HttpDelete]
