@@ -13,12 +13,12 @@ namespace ShiftsApi.Controllers
     [RoutePrefix("api/Constraints")]
     public class ConstraintsController : ApiController
     {
-        //פונקציה להחזרת רשימת האילוצים
-        [Route("GetAllConstraints")]
+        //פונקציה להחזרת רשימת האילוצים של עובד מסוים
+        [Route("GetAllConstraints/{employee_id}")]
         [HttpGet]
-        public List<ConstraintsEntity> GetAllConstraints()
+        public List<ConstraintsEntity> GetAllConstraints(string employee_id)
         {
-            return ConstraintsBL.GetAllConstraint();
+            return ConstraintsBL.GetAllConstraint(employee_id);
         }
 
         //פונקציה להחזרת אילוץ ע"י קוד
@@ -29,12 +29,11 @@ namespace ShiftsApi.Controllers
             return ConstraintsBL.GetConstraintById(s_id, e_id);
         }
         //פונקציה למחיקת אילוץ
-        [Route("DeleteConstraint/{s_id}/{e_id}")]
-        //how to pass 2 arguments? 
+        [Route("DeleteConstraint/{s_id}/{day}/{e_id}")]
         [HttpDelete]
-        public List<ConstraintsEntity> DeleteConstraint(int s_id, string e_id)
+        public List<ConstraintsEntity> DeleteConstraint(int s_id, string day, string e_id)
         {
-            return ConstraintsBL.DeleteConstraint(s_id, e_id);
+            return ConstraintsBL.DeleteConstraint(s_id, day, e_id);
         }
         //פונקציה לעדכון אילוץ
         [Route("UpdateConstraint")]

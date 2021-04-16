@@ -79,7 +79,8 @@ namespace BL
         {
             try
             {
-                ConnectDB.entity.Employees.Add(EmployeesEntity.ConvertEntityToDB(e));
+                Employees e_db = EmployeesEntity.ConvertEntityToDB(e);
+                ConnectDB.entity.Employees.Add(e_db);
                 ConnectDB.entity.SaveChanges();
             }
             catch
@@ -147,6 +148,7 @@ namespace BL
             Excel.Workbook xlworkbook = xlapp.Workbooks.Open(filePath);
             Excel._Worksheet xlworksheet = xlworkbook.Sheets[1];
             Excel.Range xlrange = xlworksheet.UsedRange;
+            List<string> deps = new List<string>();
             try
             {
 
@@ -188,6 +190,14 @@ namespace BL
                                 case "טלפון":
                                     e.phone = currentCell;
                                     break;
+                                case "מחלקה":
+                                    if (currentCell.Contains(","))//העובד עובד ביותר ממחלקה אחת
+                                    {
+                                        deps = currentCell.Split(',').ToList();
+                                    }
+                                    else
+                                        deps.Add(currentCell);
+                                    break;
                             }
                         }
                     }
@@ -196,6 +206,15 @@ namespace BL
                     if (ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == e.id) == null)
                     {
                         ConnectDB.entity.Employees.Add(EmployeesEntity.ConvertEntityToDB(e));
+                        ConnectDB.entity.SaveChanges();
+                        //הוספת מחלקות לעובד החדש
+                        foreach (var item in deps)
+                        {
+                            var dep_db = ConnectDB.entity.Departments.FirstOrDefault(x => x.Name == item);
+                            if (dep_db != null)
+                                ConnectDB.entity.add_employee_in_department(e.id, dep_db.ID);
+
+                        }
                         ConnectDB.entity.SaveChanges();
                     }
                 }

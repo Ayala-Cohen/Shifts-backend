@@ -16,19 +16,36 @@ namespace BL
             ConstraintsEntity c = ConstraintsEntity.ConvertDBToEntity(ConnectDB.entity.Constraints.First(x => x.Shift_ID == s_id && x.Employee_Id == e_id));
             return c;
         }
-        //פונקציה לשליפת רשימת אילוצים
-        public static List<ConstraintsEntity> GetAllConstraint()
+        //פונקציה לשליפת רשימת אילוצים של עובד מסוים
+        public static List<ConstraintsEntity> GetAllConstraint(string employee_id)
         {
-            List<ConstraintsEntity> l_constraints = ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.ToList());
-            return l_constraints;
+            try
+            {
+                List<ConstraintsEntity> l_constraints = ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.Where(x => x.Employee_Id == employee_id).ToList());
+                return l_constraints;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
         }
 
         //פונקציה למחיקת אילוץ
-        public static List<ConstraintsEntity> DeleteConstraint(int s_id, string e_id)
+        public static List<ConstraintsEntity> DeleteConstraint(int s_id, string day, string e_id)
         {
-            Constraints c_for_deleting = ConnectDB.entity.Constraints.First(x => x.Shift_ID == s_id && x.Employee_Id == e_id);
-            ConnectDB.entity.Constraints.Remove(c_for_deleting);
-            return ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.ToList());
+            try
+            {
+                Constraints c_for_deleting = ConnectDB.entity.Constraints.First(x => x.Shift_ID == s_id && x.Employee_Id == e_id && x.Day == day);
+                ConnectDB.entity.Constraints.Remove(c_for_deleting);
+                ConnectDB.entity.SaveChanges();
+                return ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.ToList());
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
         }
         //פונקציה לעדכון אילוץ
         public static List<ConstraintsEntity> UpdateConstraint(ConstraintsEntity c)

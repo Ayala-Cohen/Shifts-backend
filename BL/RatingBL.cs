@@ -19,11 +19,20 @@ namespace BL
         //פונקציה לשליפת רשימת דירוגים של עובד מסוים
         public static List<RatingEntity> GetAllRating(string employee_id)
         {
-            var l_rating_db = ConnectDB.entity.Rating.Where(x => x.Employee_ID == employee_id).ToList();
-            List<RatingEntity> l_rating = null;
-            if (l_rating_db.Count() != 0)
-                l_rating  = RatingEntity.ConvertListDBToListEntity(l_rating_db).ToList();
-            return l_rating;
+            try
+            {
+                var l_rating_db = ConnectDB.entity.Rating.Where(x => x.Employee_ID == employee_id).ToList();
+                List<RatingEntity> l_rating = null;
+                if (l_rating_db.Count() != 0)
+                    l_rating = RatingEntity.ConvertListDBToListEntity(l_rating_db).ToList();
+                return l_rating;
+            }
+            catch (Exception e)
+            {
+
+                return null;
+            }
+
         }
 
         //פונקציה למחיקת דירוג

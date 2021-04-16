@@ -15,25 +15,26 @@ namespace BL
         public static List<AssigningEntity> currentAssigning = new List<AssigningEntity>();
         public static Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = new Dictionary<int, Dictionary<string, IGrouping<string, Rating>>>();//מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
 
-        //פונקציה לבדיקה האם שיבוץ שייך לעסק מסוים
-        public static bool CheckIfOfBusiness(int business_id, Assigning assigning)
-        {
-            if (ConnectDB.entity.Departments.FirstOrDefault(x => x.ID == assigning.Department_ID).Business_Id != business_id)
-                return false;
-            if (ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == assigning.Employee_ID).Business_Id != business_id)
-                return false;
-            if (ConnectDB.entity.Shifts.FirstOrDefault(x => x.ID == ConnectDB.entity.Shifts_In_Days.FirstOrDefault(y => y.ID == assigning.Shift_In_Day_ID).Shift_ID).Business_Id != business_id)
-                return false;
-            return true;
-        }
 
         //פונקציה לשליפת שיבוץ סופי
         public static List<AssigningEntity> GetAssigning(int business_id)
         {
-            List<Assigning> l = ConnectDB.entity.Assigning.Where(x => CheckIfOfBusiness(business_id, x)).ToList();
-            if (l != null)
+            try
+            {
+                List<Departments> departments = ConnectDB.entity.Departments.Where(x => x.Business_Id == business_id).ToList();
+                List<Employees> employees = ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList();
+                List<Shifts> shifts = ConnectDB.entity.Shifts.Where(x => x.Business_Id == business_id).ToList();
+                List<Shifts_In_Days> shifts_In_Days = ConnectDB.entity.Shifts_In_Days.ToList();
+                shifts_In_Days = shifts_In_Days.Where(x => shifts.Any(y => y.ID == x.Shift_ID)).ToList();
+                List<Assigning> l = ConnectDB.entity.Assigning.ToList();
+                l = l.Where(x => departments.Any(y => y.ID == x.Department_ID) && employees.Any(y => y.ID == x.Employee_ID) && shifts_In_Days.Any(y => y.ID == x.Shift_In_Day_ID)).ToList();
                 return (AssigningEntity.ConvertListDBToListEntity(l));
-            return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
         }
         //יצירת מילון שיכיל כמפתח קוד משמרת ולכל משמרת יישמר מילון של הדירוגים מקובץ לפי דירוג
         public static void CreateDicShifts()
