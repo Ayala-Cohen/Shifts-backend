@@ -37,9 +37,10 @@ namespace BL
 
         }
         //יצירת מילון שיכיל כמפתח קוד משמרת ולכל משמרת יישמר מילון של הדירוגים מקובץ לפי דירוג
-        public static void CreateDicShifts()
+        public static void CreateDicShifts(int business_id)
         {
-            var grouped_by_shift = ConnectDB.entity.Rating.GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
+            var shifts_in_day = ShiftsBL.GetAllShiftsForDay(business_id);
+            var grouped_by_shift = ConnectDB.entity.Rating.ToList().Where(x=>shifts_in_day.Any(y=>y.id == x.Shift_In_Day)).GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
             //יצירת מילון שיכיל כמפתח קוד משמרת ולכל משמרת יישמר מילון של הדירוג
             foreach (var item in grouped_by_shift)
             {
@@ -58,7 +59,6 @@ namespace BL
         public static List<AssigningEntity> AssigningActivity(int business_id)
         {
             dic_of_satisfaction = EmployeesBL.CreateDictionaryOfSatisfaction(business_id);//יצירת מילון שביעות רצון לכל עובד
-            CreateDicShifts();//יצירת מילון שמכיל כמפתח קוד משמרת ותחתיו את הדירוגים לאותה המשמרת
             int min_for_performing, len_of_optimal;//משתנים שמכילים את מספר המשמרות המינימלי ההכרחי לביצוע וכן את אורך הרשימה של העובדים האופטימליים לשיבוץ
             bool is_last_option = false;//משתנה שמסמל האם נהיה מוכרחים לשבץ גם עובדים שאינם יכולים או מעדיפים שלא
             bool is_found_with_only_can_employees = false;//משתנה שיכיל בדיקה האם שיבצנו רק עובדים שיכלו
@@ -70,6 +70,7 @@ namespace BL
             {
                 EmployeesBL.CompleteRatingOfAllShifts(item.id);
             }
+            CreateDicShifts(business_id);//יצירת מילון שמכיל כמפתח קוד משמרת ותחתיו את הדירוגים לאותה המשמרת
             var list_departments = DepartmentsBL.GetAllDepartments(business_id);//רשימת המחלקות בעסק
             foreach (var dep in list_departments)//מעבר על רשימת המחלקות
             {
@@ -153,11 +154,11 @@ namespace BL
                     }
                 }
             }
-            //foreach (var item in l_employees_of_business)
-            //{
-            //    if (!EmployeesBL.CheckIfAssignedInAllShifts(item.id))//לנסות לנתח אם יכול לקרות
-            //        break;//לטפל בצורה אחרת
-            //}
+            foreach (var item in l_employees_of_business)
+            {
+                if (!EmployeesBL.CheckIfAssignedInAllShifts(item.id))//לנסות לנתח אם יכול לקרות
+                    break;//לטפל בצורה אחרת
+            }
             //בסיום השיבוץ - הכנסת הנתונים לדאטה בייס
             foreach (var item in currentAssigning)
             {

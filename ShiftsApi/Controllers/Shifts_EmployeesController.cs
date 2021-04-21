@@ -21,18 +21,18 @@ namespace ShiftsApi.Controllers
         }
 
         //פונקציה להחזרת עובד במשמרת ע"י קוד
-        [Route("GetShiftEmployeeById/{s_id}/{r_id}/{day}")]
+        [Route("GetShiftEmployeeById/{s_id}/{r_id}/{day}/{dep_id}")]
         [HttpGet]
-        public Shift_EmployeesEntity GetShiftEmployeeById(int s_id, int r_id, string day)
+        public Shift_EmployeesEntity GetShiftEmployeeById(int s_id, int r_id, string day, int dep_id)
         {
-            return Shifts_EmployeesBL.GetEmployeesShiftById(s_id, r_id, day);
+            return Shifts_EmployeesBL.GetEmployeesShiftById(s_id, r_id, day, dep_id);
         }
         //פונקציה למחיקת עובד במשמרת
-        [Route("DeleteShiftEmployee/{s_id}/{r_id}/{day}")]
+        [Route("DeleteShiftEmployee/{s_id}/{r_id}/{day}/{dep_id}")]
         [HttpDelete]
-        public List<Shift_EmployeesEntity> DeleteShiftEmployee(int s_id, int r_id, string day)
+        public List<Shift_EmployeesEntity> DeleteShiftEmployee(int s_id, int r_id, string day, int dep_id)
         {
-            return Shifts_EmployeesBL.DeleteEmployeeShift(s_id, r_id, day);
+            return Shifts_EmployeesBL.DeleteEmployeeShift(s_id, r_id, day, dep_id);
         }
         //פונקציה לעדכון עובד במשמרת
         [Route("UpdateShiftEmployee")]

@@ -29,7 +29,12 @@ namespace ShiftsApi.Controllers
         {
             return EmployeesBL.GetEmployeeById(id);
         }
-
+        [Route("GetAllEmployeesDepartments/{business_id}")]
+        [HttpGet]
+        public Dictionary<string, List<DepartmentsEntity>> GetAllEmployeesDepartments(int business_id)
+        {
+            return EmployeesBL.GetAllEmployeesDepartments(business_id);
+        }
         //פונקציה להחזרת רשימת מחלקות בהן העובד עובד
         [Route("GetDepartmentsForEmployee/{id}")]
         [HttpGet]
@@ -80,17 +85,17 @@ namespace ShiftsApi.Controllers
         {
             var httpRequest = HttpContext.Current.Request;
             var postedFile = httpRequest.Files["employeesListXL"];
-            string filePath ="";
+            string filePath = "";
             if (postedFile != null)
             {
                 string name = postedFile.FileName;
                 name = name.Substring(0, name.IndexOf('.'));
                 var fileName = name + business_id.ToString() + Path.GetExtension(postedFile.FileName);
                 filePath = HttpContext.Current.Server.MapPath("~/Files/" + fileName);
-                if(!File.Exists(filePath))
+                if (!File.Exists(filePath))
                     postedFile.SaveAs(filePath);
             }
-            return EmployeesBL.ImportFromExcel(business_id,filePath );
+            return EmployeesBL.ImportFromExcel(business_id, filePath);
         }
     }
 }

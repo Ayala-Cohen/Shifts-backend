@@ -97,6 +97,7 @@
         </EntityType>
         <EntityType Name="Shift_Employees">
           <Key>
+            <PropertyRef Name="Departments_Id" />
             <PropertyRef Name="Role_Id" />
             <PropertyRef Name="Shift_ID" />
             <PropertyRef Name="Day" />
@@ -562,6 +563,7 @@
             <PropertyRef Name="Role_Id" />
             <PropertyRef Name="Shift_ID" />
             <PropertyRef Name="Day" />
+            <PropertyRef Name="Departments_Id" />
           </Key>
           <Property Name="Business_Id" Type="Int32" Nullable="false" />
           <Property Name="Departments_Id" Type="Int32" Nullable="false" />

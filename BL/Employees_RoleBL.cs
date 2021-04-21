@@ -41,29 +41,49 @@ namespace BL
         //פונקציה למחיקת תפקיד
         public static List<Employee_RolesEntity> DeleteEmployeeRole(int id)
         {
-            //מחיקה של כל הנתונים המקושרים לשדה זה 
-            foreach (var item in ConnectDB.entity.Employees.Where(x=>x.Role_Id==id))
+            try
             {
-                ConnectDB.entity.Employees.Remove(item);
+                Employee_Roles role_for_deleting = ConnectDB.entity.Employee_Roles.First(x => x.ID == id);
+
+                //מחיקה של כל הנתונים המקושרים לשדה זה 
+                foreach (var item in ConnectDB.entity.Employees.Where(x => x.Role_Id == id))
+                {
+                    EmployeesBL.DeleteEmployee(item.ID);
+                }
+                foreach (var item in ConnectDB.entity.Shift_Employees.Where(x => x.Role_Id == id))
+                {
+                    Shifts_EmployeesBL.DeleteEmployeeShift(item.Shift_ID, id, item.Day, item.Departments_Id);
+                }
+                int business_id = role_for_deleting.Business_Id;
+                ConnectDB.entity.Employee_Roles.Remove(role_for_deleting);
+                ConnectDB.entity.SaveChanges();
+                return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == business_id).ToList());
             }
-            foreach (var item in ConnectDB.entity.Shift_Employees.Where(x=>x.Role_Id==id))
+            catch (Exception)
             {
-                ConnectDB.entity.Shift_Employees.Remove(item);
+
+                return null;
             }
-            Employee_Roles role_for_deleting = ConnectDB.entity.Employee_Roles.First(x => x.ID == id);
-            int business_id = role_for_deleting.Business_Id;
-            ConnectDB.entity.Employee_Roles.Remove(role_for_deleting);
-            return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == business_id).ToList());
+
         }
         //פונקציה לעדכון תפקיד
         public static List<Employee_RolesEntity> UpdateEmployeeRole(Employee_RolesEntity e)
         {
-            Employee_Roles role_for_updating = ConnectDB.entity.Employee_Roles.First(x => x.ID == e.id);
-            role_for_updating.Business_Id = e.business_id;
-            role_for_updating.Min_Of_Shift = e.min_of_shift;
-            role_for_updating.Role = e.role;
-            ConnectDB.entity.SaveChanges();
-            return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == e.business_id).ToList());
+            try
+            {
+                Employee_Roles role_for_updating = ConnectDB.entity.Employee_Roles.First(x => x.ID == e.id);
+                role_for_updating.Business_Id = e.business_id;
+                role_for_updating.Min_Of_Shift = e.min_of_shift;
+                role_for_updating.Role = e.role;
+                ConnectDB.entity.SaveChanges();
+                return Employee_RolesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employee_Roles.Where(x => x.Business_Id == e.business_id).ToList());
+            }
+            catch (Exception)
+            {
+
+                return null;
+            }
+
         }
 
 

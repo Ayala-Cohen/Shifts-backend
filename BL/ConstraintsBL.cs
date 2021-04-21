@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,8 +14,16 @@ namespace BL
         //פונקציה לשליפת אילוץ בודד על פי קוד
         public static ConstraintsEntity GetConstraintById(int s_id, string e_id)
         {
-            ConstraintsEntity c = ConstraintsEntity.ConvertDBToEntity(ConnectDB.entity.Constraints.First(x => x.Shift_ID == s_id && x.Employee_Id == e_id));
-            return c;
+            try
+            {
+                ConstraintsEntity c = ConstraintsEntity.ConvertDBToEntity(ConnectDB.entity.Constraints.First(x => x.Shift_ID == s_id && x.Employee_Id == e_id));
+                return c;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
         }
         //פונקציה לשליפת רשימת אילוצים של עובד מסוים
         public static List<ConstraintsEntity> GetAllConstraint(string employee_id)
@@ -26,6 +35,7 @@ namespace BL
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e);
                 return null;
             }
 
@@ -39,10 +49,11 @@ namespace BL
                 Constraints c_for_deleting = ConnectDB.entity.Constraints.First(x => x.Shift_ID == s_id && x.Employee_Id == e_id && x.Day == day);
                 ConnectDB.entity.Constraints.Remove(c_for_deleting);
                 ConnectDB.entity.SaveChanges();
-                return ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.ToList());
+                return GetAllConstraint(e_id);
             }
             catch (Exception e)
             {
+                Debug.WriteLine(e);
                 return null;
             }
 
@@ -50,10 +61,18 @@ namespace BL
         //פונקציה לעדכון אילוץ
         public static List<ConstraintsEntity> UpdateConstraint(ConstraintsEntity c)
         {
-            Constraints c_for_updating = ConnectDB.entity.Constraints.First(x => x.Shift_ID == c.shift_id && x.Employee_Id == c.employee_id);
-            c_for_updating.Day = c.day;
-            ConnectDB.entity.SaveChanges();
-            return ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.ToList());
+            try
+            {
+                Constraints c_for_updating = ConnectDB.entity.Constraints.First(x => x.Shift_ID == c.shift_id && x.Employee_Id == c.employee_id);
+                c_for_updating.Day = c.day;
+                ConnectDB.entity.SaveChanges();
+                return GetAllConstraint(c.employee_id);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+
         }
 
         //פונקציה להוספת אילוץ
@@ -66,7 +85,7 @@ namespace BL
             }
             catch
             { }
-            return ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.ToList());
+            return GetAllConstraint(c.employee_id);
         }
 
 
