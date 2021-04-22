@@ -267,7 +267,7 @@ namespace BL
                     }
                     e.business_id = business_id;
                     var b = BusinessBL.GetBusinessById(business_id);
-                    e.password = $"{b.name}{e.id}";
+                    e.password = $"Ab{e.id}";
                     if (ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == e.id) == null)
                     {
                         ConnectDB.entity.Employees.Add(EmployeesEntity.ConvertEntityToDB(e));
