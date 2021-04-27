@@ -40,7 +40,7 @@ namespace BL
         public static void CreateDicShifts(int business_id)
         {
             var shifts_in_day = ShiftsBL.GetAllShiftsForDay(business_id);
-            var grouped_by_shift = ConnectDB.entity.Rating.ToList().Where(x=>shifts_in_day.Any(y=>y.id == x.Shift_In_Day)).GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
+            var grouped_by_shift = ConnectDB.entity.Rating.ToList().Where(x => shifts_in_day.Any(y => y.id == x.Shift_In_Day)).GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
             //יצירת מילון שיכיל כמפתח קוד משמרת ולכל משמרת יישמר מילון של הדירוג
             foreach (var item in grouped_by_shift)
             {
@@ -84,7 +84,6 @@ namespace BL
                         min_for_performing = role.number_of_shift_employees;//מספר העובדים מהתפקיד הנדרשים לכל משמרת
                         var l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);//שליפת רשימת העובדים האופטימליים לתפקיד זה
                         len_of_optimal = l_employees.Count;//אורך רשימת האופטימליים על מנת לבדוק שאכן עמדנו במספר הנדרש
-                        var dic_rating_can_prefere = dic_shift_rating[shift_in_day.id].Where(y => y.Key == "יכול" || y.Key == "מעדיף");//שליפת הדירוגים מעדיף ויכול למשמרת זו
                         while (len_of_optimal != min_for_performing)//כל עוד לא שובצו עובדים כמספר המינימלי הנדרש
                         {
                             if (currentAssigning.Count == 0)//אם בפעם הראשונה של השיבוץ לא נמצאו עובדים כמכסה המינימלית
@@ -97,6 +96,7 @@ namespace BL
                             {
                                 foreach (var a in currentAssigning.ToList())//מעבר על השיבוץ המקומי על מנת לבדוק האם ישנו עובד שאם נזיז אותו למשמרת אחרת נצליח לשבץ את מספר העובדים הנדרש
                                 {
+                                    var dic_rating_can_prefere = dic_shift_rating[shift_in_day.id].Where(y => y.Key == "יכול" || y.Key == "מעדיף");//שליפת הדירוגים מעדיף ויכול למשמרת זו
                                     var l_assigned_with_high_rating = dic_rating_can_prefere.Where(x => x.Value.Any(y => y.Employee_ID == a.employee_id) && !l_employees.Any(y => y.id == a.employee_id));//שליפת הדירוגים של העובד שעליו אנו מבצעים את הבדיקה בתנאי שהוא לא מועמד מלכתחילה לשיבוץ במשמרת זו
                                     l_assigned_with_high_rating = l_assigned_with_high_rating.Where(x => EmployeesBL.GetEmployeeById(a.employee_id).role_id == role.role_id);//הגבלה לשורה הקודמת - רק אם העובד מאותו התפקיד שאנו מנסים לשבץ כרגע
                                     if (l_assigned_with_high_rating.Count() != 0)// בדיקה שאכן לעובד הנוכחי היה דירוג גבוה למשמרת זו
@@ -149,7 +149,11 @@ namespace BL
                             //עדכון לטבלת שביעות רצון ע"מ שלא נתחשב פעמים באותו עובד
                             //הוספה מקומית למילון - הגדלה של רמת השביעות רצון 
                             //בסוף השיבוץ נכניס גם לדאטה בייס
-                            dic_of_satisfaction[e.id][1]++;
+                            var rating = RatingBL.GetRatingById(e.id, shift_in_day.id);
+                            if (rating.rating == "יכול" || rating.rating == "מעדיף")
+                                dic_of_satisfaction[e.id][1]++;
+                            else
+                                dic_of_satisfaction[e.id][4]++;
                         }
                     }
                 }

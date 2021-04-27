@@ -88,7 +88,7 @@ namespace BL
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                Debug.WriteLine($"בעדכון עובד{ex}");
                 return null;
             }
 
@@ -204,6 +204,35 @@ namespace BL
                 return null;
             }
         }
+        public static bool CheckId(string id)
+        {
+            int sum = 0;
+            if (id.Count() == 9)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    if (((i + 1) % 2) != 0)
+                    {
+                        sum += int.Parse(id[i].ToString());
+                    }
+                    else
+                    {
+                        int num = int.Parse(id[i].ToString()) * 2;
+                        if (num >= 10)
+                            sum += (num % 10 + (num - (num % 10)) / 10);
+                        else
+                            sum += num;
+                    }
+                }
+                return sum % 10 == 0;
+
+            }
+            return false;
+        }
+
+
+
+
         //פונקציה להכנסת נתוני עובדים מקובץ אקסל
         public static List<EmployeesEntity> ImportFromExcel(int business_id, string filePath)
         {
@@ -212,12 +241,13 @@ namespace BL
             Excel.Workbook xlworkbook = xlapp.Workbooks.Open(filePath);
             Excel._Worksheet xlworksheet = xlworkbook.Sheets[1];
             Excel.Range xlrange = xlworksheet.UsedRange;
-            List<string> deps = new List<string>();
+            List<string> deps;
             try
             {
 
                 for (int i = 2; i <= xlrange.Rows.Count; i++)
                 {
+                    deps = new List<string>();
                     for (int j = 1; j <= xlrange.Columns.Count; j++)
                     {
                         var contentObj = xlrange.Cells[i, j];
@@ -230,7 +260,8 @@ namespace BL
                             switch (header)
                             {
                                 case "מספר זהות":
-                                    e.id = currentCell;
+                                    if (CheckId(currentCell))
+                                        e.id = currentCell;
                                     break;
                                 case "שם":
                                     e.name = currentCell;
@@ -285,8 +316,9 @@ namespace BL
                 }
                 return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
             }
-            catch
+            catch(Exception ex)
             {
+                Debug.WriteLine($"{ex}בהעתקת נתונים מקובץ אקסל");
                 return null;
             }
             finally
@@ -449,7 +481,7 @@ namespace BL
                 Dictionary<string, Dictionary<int, int>> d = AssigningBL.dic_of_satisfaction;//מילון שביעות רצון
                 var grouped_by_shift = ConnectDB.entity.Rating.GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
                 Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = AssigningBL.dic_shift_rating;//מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
-                var dic_of_shift = OrderByRating(dic_shift_rating[shift_in_day_id]);
+                var dic_of_shift = OrderByRating(dic_shift_rating[shift_in_day_id]);//מיון רשימת הדירוגים על מנת שישבץ קודם כל את אלו שמעדיפים, אחר כך את יכולים וכו
                 foreach (var item in dic_of_shift)//בדיקה לגבי המשמרת הספציפית
                 {
                     //שליפת העובדים שמופיעים תחת הדירוג הנוכחי מתוך המילון
@@ -484,8 +516,9 @@ namespace BL
                 }
                 return l;
             }
-            catch
+            catch(Exception e)
             {
+                Debug.WriteLine($"במציאת עובדים אופטימלים{e}");
                 return null;
             }
 

@@ -116,15 +116,15 @@ namespace BL
                             break;
                         case "מעדיף שלא":
                             if (item.Shift_Approved == true)
-                                s.satisfaction_status = 3;
+                                s.satisfaction_status = 4;
                             else
-                                s.satisfaction_status = 2;
+                                s.satisfaction_status = 1;
                             break;
                         case "יכול":
                             if (item.Shift_Approved == true)
-                                s.satisfaction_status = 2;
+                                s.satisfaction_status = 1;
                             else
-                                s.satisfaction_status = 3;
+                                s.satisfaction_status = 4;
                             break;
                         case "מעדיף":
                             if (item.Shift_Approved == true)
