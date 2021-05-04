@@ -90,7 +90,7 @@ namespace BL
                 return GetAllRating(r.employee_id);
 
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.WriteLine(e);
                 return null;
@@ -98,12 +98,12 @@ namespace BL
         }
 
         //פונקציה לקביעת דירוג סטטיטי עבור עובד
-        public static List<Satisfaction_StatusEntity> updateStatus()
+        public static List<Satisfaction_StatusEntity> SetStatus()
         {
             try
             {
                 Satisfaction_StatusEntity s = new Satisfaction_StatusEntity();
-                foreach (var item in ConnectDB.entity.Rating)
+                foreach (var item in ConnectDB.entity.Rating.ToList())
                 {
                     s.employee_id = item.Employee_ID;
                     switch (item.Rating1)
@@ -138,10 +138,37 @@ namespace BL
                 }
                 return Satisfaction_StatusEntity.ConvertListDBToListEntity(ConnectDB.entity.Satisfaction_Status.ToList());
             }
-            catch
+            catch (Exception e)
             {
+                Debug.WriteLine(e);
                 return null;
             }
+        }
+
+        //פונקציה לעדכון מילון שביעות רצון (מקומי) במהלך תהליך השיבוץ
+        public static void UpdateStatusLocal(int shift_in_day_id, string employee_id = "", int level_to_update = 0)
+        {
+            //if (employee_id != "" && level_to_update != 0)
+                foreach (var rating_level in AssigningBL.dic_shift_rating[shift_in_day_id])//מעבר על מילון הדירוגים במשמרת שהתקבלה
+                {
+                    foreach (var rating in rating_level.Value)//מעבר על רשימת העובדים שדירגו משמרת זו בדירוג ספציפי זה
+                    {
+                        if (rating_level.Key == "מעדיף" || rating_level.Key == "יכול")
+                        {
+                            if (rating.Shift_Approved == true)
+                                AssigningBL.dic_of_satisfaction[rating.Employee_ID][1]++;
+                            else
+                                AssigningBL.dic_of_satisfaction[rating.Employee_ID][4]++;
+                        }
+                        else
+                        {
+                            if (rating.Shift_Approved == true)
+                                AssigningBL.dic_of_satisfaction[rating.Employee_ID][4]++;
+                            else
+                                AssigningBL.dic_of_satisfaction[rating.Employee_ID][1]++;
+                        }
+                    }
+                }
         }
     }
 }

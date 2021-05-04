@@ -107,11 +107,12 @@ namespace BL
                                             earlier_assigning = a;//שמירת הערך מרשימת השיבוץ המקומי למשתנה
                                             currentAssigning.Remove(a);//הסרתו מהרשימה
                                             UpdateShiftApproved(false, earlier_assigning.employee_id, shift_in_day.id);//עדכון שהמשמרת לא התקבלה בסופו של דבר
+                                            RatingBL.UpdateStatusLocal(shift_in_day.id);
                                             var employee_for_replace = l_for_replace.First();
                                             //הוספה לשיבוץ המקומי
                                             currentAssigning.Add(new AssigningEntity() { shift_in_day_id = a.shift_in_day_id, employee_id = employee_for_replace.id, department_id = a.department_id });
                                             UpdateShiftApproved(true, employee_for_replace.id, a.shift_in_day_id);
-
+                                            RatingBL.UpdateStatusLocal(shift_in_day.id);
                                             l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);//חיפוש לאחר השינוי
                                             len_of_optimal = l_employees.Count;
                                             if (len_of_optimal == min_for_performing)//ההחלפה הועילה
@@ -123,9 +124,11 @@ namespace BL
                                             {
                                                 local_assigning.Add(earlier_assigning);//נוסיף משתנה זה לרשימה מקומית כדי שלא תווצר לולאה אינסופית מכיון שרשימת השיבוץ מתעדכנת כל הזמן
                                                 UpdateShiftApproved(true, earlier_assigning.employee_id, earlier_assigning.shift_in_day_id);
+                                                RatingBL.UpdateStatusLocal(shift_in_day.id);
                                                 // הסרת העובד החדש ששבצנו מרשימת השיבוץ
                                                 currentAssigning.Remove(currentAssigning.First(x => x.shift_in_day_id == earlier_assigning.shift_in_day_id && x.employee_id == employee_for_replace.id));
                                                 UpdateShiftApproved(false, employee_for_replace.id, earlier_assigning.shift_in_day_id);
+                                                RatingBL.UpdateStatusLocal(shift_in_day.id);
                                             }
                                         }
                                     }
@@ -146,16 +149,12 @@ namespace BL
                         {
                             currentAssigning.Add(new AssigningEntity { department_id = dep.id, employee_id = e.id, shift_in_day_id = shift_in_day.id });
                             UpdateShiftApproved(true, e.id, shift_in_day.id);
-                            //עדכון לטבלת שביעות רצון ע"מ שלא נתחשב פעמים באותו עובד
-                            //הוספה מקומית למילון - הגדלה של רמת השביעות רצון 
-                            //בסוף השיבוץ נכניס גם לדאטה בייס
-                            var rating = RatingBL.GetRatingById(e.id, shift_in_day.id);
-                            if (rating.rating == "יכול" || rating.rating == "מעדיף")
-                                dic_of_satisfaction[e.id][1]++;
-                            else
-                                dic_of_satisfaction[e.id][4]++;
                         }
                     }
+                    //עדכון לטבלת שביעות רצון ע"מ שלא נתחשב פעמים באותו עובד
+                    //הוספה מקומית למילון - הגדלה של רמת השביעות רצון 
+                    //בסוף השיבוץ נכניס גם לדאטה בייס
+                    RatingBL.UpdateStatusLocal(shift_in_day.id);
                 }
             }
             foreach (var item in l_employees_of_business)
@@ -167,27 +166,34 @@ namespace BL
             foreach (var item in currentAssigning)
             {
                 ConnectDB.entity.Assigning.Add(AssigningEntity.ConvertEntityToDB(item));//עדכון טבלת שיבוץ סופי
-                RatingBL.updateStatus();//עדכון טבלת שביעות רצון
+                RatingBL.SetStatus();//עדכון טבלת שביעות רצון
             }
             ConnectDB.entity.SaveChanges();
             return GetAssigning(business_id);
         }
 
         //פונקציה לשליפת רשימת העובדים שיכולים או מעדיפים משמרת על מנת שהמנהל יוכל להחליף בצורה ידנית
-        public static List<EmployeesEntity> GetEmployeesWithHighRating(int business_id, int shift_id, int role_id)
+        public static Dictionary<int, List<EmployeesEntity>> GetEmployeesWithHighRating(int business_id, int shift_id)
         {
             List<EmployeesEntity> l_employees_of_business = EmployeesBL.GetAllEmployees(business_id);
             List<EmployeesEntity> l_suitable = new List<EmployeesEntity>();
+            List<Employee_RolesEntity> l_roles = Employees_RoleBL.GetAllEmployeesRoles(business_id);
+            Dictionary<int, List<EmployeesEntity>> dic_suitable = new Dictionary<int, List<EmployeesEntity>>();
             var dic_rating_can_prefere = dic_shift_rating[shift_id].Where(y => y.Key == "יכול" || y.Key == "מעדיף");//שליפת הדירוגים מעדיף ויכול למשמרת זו
-            foreach (var item in l_employees_of_business)
+            foreach (var role in l_roles)
             {
-                if (item.role_id == role_id && dic_rating_can_prefere.Where(x => x.Value.Any(y => y.Employee_ID == item.id)) != null) //בדיקה שהעובד אכן רוצה משמרת זו וכן שתפקידו זהה לתפקיד הנדרש
+                foreach (var item in l_employees_of_business)
                 {
-                    if (!EmployeesBL.CheckIfAssignedInShift(shift_id, item.id))//בדיקה שלא משובץ כבר במשמרת אחרת
-                        l_suitable.Add(item);
+                    if (item.role_id == role.id && dic_rating_can_prefere.Where(x => x.Value.Any(y => y.Employee_ID == item.id)) != null) //בדיקה שהעובד אכן רוצה משמרת זו וכן שתפקידו זהה לתפקיד הנדרש
+                    {
+                        if (!EmployeesBL.CheckIfAssignedInShift(shift_id, item.id))//בדיקה שלא משובץ כבר במשמרת אחרת
+                            l_suitable.Add(item);
+                    }
                 }
+                dic_suitable.Add(role.id, l_suitable);
             }
-            return l_suitable;
+
+            return dic_suitable;
         }
     }
 }

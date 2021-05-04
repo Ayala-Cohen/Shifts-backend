@@ -34,7 +34,8 @@ namespace BL
         {
             try
             {
-                List<EmployeesEntity> l_employees = EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
+                var l_employees_db = ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList();
+                List<EmployeesEntity> l_employees = EmployeesEntity.ConvertListDBToListEntity(l_employees_db);
                 return l_employees;
             }
             catch (Exception)
@@ -49,16 +50,16 @@ namespace BL
             try
             {
                 //מחיקה של כל הנתונים המקושרים לשדה זה 
-                foreach (var item in ConnectDB.entity.Rating.Where(x => x.Employee_ID == id))
+                foreach (var item in ConnectDB.entity.Rating.Where(x => x.Employee_ID == id).ToList())
                 {
                     RatingBL.DeleteRating(id, item.Shift_In_Day);
                 }
 
-                foreach (var item in ConnectDB.entity.Constraints.Where(x => x.Employee_Id == id))
+                foreach (var item in ConnectDB.entity.Constraints.Where(x => x.Employee_Id == id).ToList())
                 {
                     ConstraintsBL.DeleteConstraint(item.Shift_ID, item.Day, id);
                 }
-                Employees employee_for_deleting = ConnectDB.entity.Employees.First(x => x.ID == id);
+                Employees employee_for_deleting = ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id);
                 int business_id = employee_for_deleting.Business_Id;
                 ConnectDB.entity.Employees.Remove(employee_for_deleting);
                 ConnectDB.entity.SaveChanges();
@@ -118,13 +119,15 @@ namespace BL
             try
             {
                 Dictionary<string, List<DepartmentsEntity>> l = new Dictionary<string, List<DepartmentsEntity>>();
-                var l_employees = GetAllEmployees(business_id);
-                if (l_employees != null)
+                var l_employees_db = ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList();
+                //var l_employees = GetAllEmployees(business_id);
+                if (l_employees_db != null)
                 {
-                    foreach (var employee in l_employees)
+                    foreach (var employee in l_employees_db)
                     {
-                        var l_departments = GetDepartmentsForEmployee(employee.id);
-                        l.Add(employee.id, l_departments);
+                        //var l_departments = GetDepartmentsForEmployee(employee.id);
+                        var l_departments = employee.Departments.ToList();
+                        l.Add(employee.ID, DepartmentsEntity.ConvertListDBToListEntity(l_departments));
                     }
                 }
                 return l;
@@ -358,28 +361,28 @@ namespace BL
             {
                 Dictionary<string, Dictionary<int, int>> d = new Dictionary<string, Dictionary<int, int>>();
                 Dictionary<int, int> dic;
-                if (ConnectDB.entity.Satisfaction_Status.Count() != 0)
-                {//פונקציה ליצירת מילון המכיל כמפתח קוד עובד ועבור כל עובד את השכיחות של כל דירוג סטטיסטי
-
+                //if (ConnectDB.entity.Satisfaction_Status.Count() != 0)
+                //{
+                    //פונקציה ליצירת מילון המכיל כמפתח קוד עובד ועבור כל עובד את השכיחות של כל דירוג סטטיסטי
                     //רשימת העובדים בעסק ספציפי
                     var employees_of_business = GetAllEmployees(business_id);
-                    var satisfaction_status_of_specific_business = ConnectDB.entity.Satisfaction_Status.Where(x => ConnectDB.entity.Employees.FirstOrDefault(y => y.ID == x.Employee_ID).Business_Id == business_id);
+                    var satisfaction_status_of_specific_business = ConnectDB.entity.Satisfaction_Status.Where(x => ConnectDB.entity.Employees.FirstOrDefault(y => y.ID == x.Employee_ID).Business_Id == business_id).ToList();
                     var grouped_list = satisfaction_status_of_specific_business.GroupBy(x => x.Employee_ID).ToDictionary(x => x.Key);//קיבוץ לפי קוד עובד
                     foreach (var employee in employees_of_business)//מעבר על הרשימה המקובצת
                     {
-                        dic = new Dictionary<int, int>() { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 } };
+                        dic = new Dictionary<int, int>() { { 1, 0 }, { 4, 0 } };
 
                         if (grouped_list.Any(x => x.Key == employee.id))//אם לעובד יש ערכים בטבלת שביעות רצון
                         {
-                            dic.Clear();
+                            //dic.Clear();
                             foreach (var status in ConnectDB.entity.Satisfaction_Status.GroupBy(x => x.Satisfaction_Status1))//מעבר על רשימת הדירוגים הסטטיסטיים המקובצת לפי דירוג סטטיסטי
                             {
-                                dic.Add(status.Key, grouped_list[employee.id].Count(x => x.Satisfaction_Status1 == status.Key));//הוספת ערכים למילון השכיחויות  
+                                dic[status.Key] = grouped_list[employee.id].Count(x => x.Satisfaction_Status1 == status.Key);//הוספת ערכים למילון השכיחויות  
                             }
                         }
                         d.Add(employee.id, dic); //הוספת ערכים למילון הראשי
                     }
-                }
+                //}
                 return d;
             }
             catch
@@ -518,7 +521,7 @@ namespace BL
             }
             catch(Exception e)
             {
-                Debug.WriteLine($"במציאת עובדים אופטימלים{e}");
+                Debug.WriteLine($"במציאת עובדים אופטימלים\n{e}");
                 return null;
             }
 
