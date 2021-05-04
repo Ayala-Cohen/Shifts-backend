@@ -381,7 +381,8 @@ namespace BL
 
         }
         //פונקציה להחזרת העובד האופטימלי לשיבוץ
-        public static List<EmployeesEntity> GetOptimalEmployee(int shift_in_day_id, int role_id, int min_for_perfoming, bool is_last_option)
+        public static List<EmployeesEntity> GetOptimalEmployee(int shift_in_day_id, int role_id,
+            int min_for_perfoming, bool is_last_option)
         {
             #region oneEmployee
             //:מציאת העובד האופטימלי לשיבוץ מתנהל בצורה כזו
@@ -444,16 +445,21 @@ namespace BL
                 int shift_id, key;
                 bool is_has_constaint;
                 List<EmployeesEntity> l = new List<EmployeesEntity>();
-                Dictionary<string, KeyValuePair<string, Dictionary<int, int>>> l_suitable;//רשימת העובדים המתאימים לשיבוץ במשמרת זו
+                //רשימת העובדים המתאימים לשיבוץ במשמרת זו
+                Dictionary<string, KeyValuePair<string, Dictionary<int, int>>> l_suitable;
                 string id, day;
-                Dictionary<string, Dictionary<int, int>> d = AssigningBL.dic_of_satisfaction;//מילון שביעות רצון
-                var grouped_by_shift = ConnectDB.entity.Rating.GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
-                Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = AssigningBL.dic_shift_rating;//מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
+                //מילון שביעות רצון
+                Dictionary<string, Dictionary<int, int>> d = AssigningBL.dic_of_satisfaction;
+                //רשימת הדירוגים מקובצת לפי משמרות
+                var grouped_by_shift = ConnectDB.entity.Rating.GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);
+                //מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
+                Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = AssigningBL.dic_shift_rating;
                 var dic_of_shift = OrderByRating(dic_shift_rating[shift_in_day_id]);
                 foreach (var item in dic_of_shift)//בדיקה לגבי המשמרת הספציפית
                 {
                     //שליפת העובדים שמופיעים תחת הדירוג הנוכחי מתוך המילון
-                    var specific = d.Where(x => item.Value.Any(y => y.Employee_ID == x.Key) && GetEmployeeById(x.Key).role_id == role_id);
+                    var specific = d.Where(x => item.Value.Any(y => y.Employee_ID == x.Key)
+                    && GetEmployeeById(x.Key).role_id == role_id);
 
                     if (item.Key == "מעדיף" || item.Key == "יכול")
                         key = 4;
@@ -461,21 +467,29 @@ namespace BL
                         key = 1;
                     if (specific.Count() != 0)//כאשר ישנם עובדים מאותו התפקיד תחת אותו הדירוג
                     {
-                        if (key == 4 || is_last_option)//שיבוץ קודם כל של אלו שיכולים ומעדיפים ואם אין אופציה אחרת נשבץ גם את אלו בדירוגים הנמוכים יותר
+                        //שיבוץ קודם כל של אלו שיכולים ומעדיפים ואם אין
+                        // אופציה אחרת נשבץ גם את אלו בדירוגים הנמוכים יותר
+                        if (key == 4 || is_last_option)
                         {
-                            l_suitable = d.Where(x => specific.Any(y => y.Key == x.Key)).OrderByDescending(x => x.Value[key]).ToDictionary(x => x.Key);
+                            l_suitable = d.Where(x => specific.Any(y => y.Key == x.Key)).OrderByDescending
+                                (x => x.Value[key]).ToDictionary(x => x.Key);
                             foreach (var employee in l_suitable)
                             {
                                 id = employee.Key;//מספר הזהות של העובד האופטימלי לשיבוץ הנוכחי
-                                day = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Day;//היום לגביו מתבצעת הבדיקה
-                                shift_id = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Shift_ID;//המשמרת לגביה מתבצעת הבדיקה
-                                                                                                                        //בדיקה האם לעובד זה יש אילוץ קבוע במשמרת זו
-                                is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault(x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
+                                //היום לגביו מתבצעת הבדיקה
+                                day = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Day;
+                                //המשמרת לגביה מתבצעת הבדיקה
+                                shift_id = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Shift_ID;
+                                //בדיקה האם לעובד זה יש אילוץ קבוע במשמרת זו
+                                is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault
+                                    (x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
                                 //עדיין לא שובץ בכל המשמרות שעליו לבצע ואין לו אילוץ קבוע במשמרת זו וכן שהוא לא משובץ כבר במשמרת זו 
                                 if (!CheckIfAssignedInAllShifts(id) && !is_has_constaint && !CheckIfAssignedInShift(shift_in_day_id, id))
                                 {
-                                    l.Add(EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id)));//הוספה לרשימה הסופית של העובדים האופטימליים
-                                    if (l.Count() == min_for_perfoming)//כאשר נמצאו מספר עובדים מתאימים לפי מספר העובדים הנדרשים למשמרת זו מאותו התפקיד
+                                    //הוספה לרשימה הסופית של העובדים האופטימליים
+                                    l.Add(EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id)));
+                                    //כאשר נמצאו מספר עובדים מתאימים לפי מספר העובדים הנדרשים למשמרת זו מאותו התפקיד
+                                    if (l.Count() == min_for_perfoming)
                                         return l;
                                 }
                             }

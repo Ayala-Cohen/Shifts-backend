@@ -31,6 +31,7 @@ namespace DAL
         public string Password { get; set; }
         public string Full_Name { get; set; }
         public int Number { get; set; }
+        public Nullable<System.DateTime> LastAssigningDate { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Departments> Departments { get; set; }

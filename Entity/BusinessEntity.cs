@@ -18,12 +18,14 @@ namespace Entity
         public string full_name { get; set; }
         public int number { get; set; }
 
+        public Nullable<DateTime> LastAssigningDate { get; set; }
+
 
         //המרת עסק בודד מסוג המסד לסוג המחלקה
 
         public static BusinessEntity ConvertDBToEntity(Business b)
         {
-            return new BusinessEntity() { id = b.ID, name = b.Name, logo = b.Logo, user_name = b.User_Name, password = b.Password, full_name = b.Full_Name, number = b.Number };
+            return new BusinessEntity() { id = b.ID, name = b.Name, logo = b.Logo, user_name = b.User_Name, password = b.Password, full_name = b.Full_Name, number = b.Number ,LastAssigningDate=b.LastAssigningDate};
         }
 
 

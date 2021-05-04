@@ -26,6 +26,7 @@
           <Property Name="Password" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Full_Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Number" Type="int" Nullable="false" />
+          <Property Name="LastAssigningDate" Type="datetime" />
         </EntityType>
         <EntityType Name="Constraints">
           <Key>
@@ -479,6 +480,7 @@
           <NavigationProperty Name="Employee_Roles" Relationship="Self.FK_Table_Employee_Roles_Business" FromRole="Business" ToRole="Employee_Roles" />
           <NavigationProperty Name="Shift_Employees" Relationship="Self.FK_Table_Shift_Workers_Business" FromRole="Business" ToRole="Shift_Employees" />
           <NavigationProperty Name="Employees" Relationship="Self.FK_Table_Workers_Business" FromRole="Business" ToRole="Employees" />
+          <Property Name="LastAssigningDate" Type="DateTime" Precision="3" />
         </EntityType>
         <EntityType Name="Constraints">
           <Key>
@@ -914,6 +916,7 @@
           <EntitySetMapping Name="Business">
             <EntityTypeMapping TypeName="ShiftsModel.Business">
               <MappingFragment StoreEntitySet="Business">
+                <ScalarProperty Name="LastAssigningDate" ColumnName="LastAssigningDate" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Logo" ColumnName="Logo" />
