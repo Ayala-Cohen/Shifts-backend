@@ -105,7 +105,8 @@ namespace BL
             {
                 var day = ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.ID == shift_in_day_id).Day;
                 var shift = ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.ID == shift_in_day_id).Shift_ID;
-                var l = GetAllEmployeesShifts(business_id).Where(x => x.department_id == department_id && day == x.day && x.shift_id == shift).ToList();
+                var l_whole_shifts = GetAllEmployeesShifts(business_id);
+                var l = l_whole_shifts.Where(x => x.department_id == department_id && day == x.day && x.shift_id == shift).ToList();
                 return l;
             }
             catch

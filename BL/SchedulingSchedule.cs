@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace BL
 {
-   public  static class SchedulingSchedule
+    public static class SchedulingSchedule
     {
-       static SchedulingSchedule()
+        static SchedulingSchedule()
         {
 
-           // scheduleAsync();
+            // scheduleAsync();
 
         }
 
@@ -37,10 +37,10 @@ namespace BL
             ITrigger trigger = TriggerBuilder.Create()
                 .WithIdentity("trigger1", "group1")
 .WithSchedule(CronScheduleBuilder
-    .DailyAtHourAndMinute(0,0))
+    .DailyAtHourAndMinute(0, 0))
 .Build();
 
-      
+
             await scheduler.ScheduleJob(job, trigger);
 
         }
@@ -57,22 +57,24 @@ namespace BL
         public async Task Execute(IJobExecutionContext context)
         {
             ConnectDB.entity.Business.ToList().ForEach(b =>
-        { if (newAssigningNeeded(b.ID))
-                AssigningBL.AssigningActivity(b.ID); });
-               
+        {
+            if (newAssigningNeeded(b.ID))
+                AssigningBL.AssigningActivity(b.ID);
+        });
+
         }
 
-        public bool  newAssigningNeeded(int code)
+        public bool newAssigningNeeded(int code)
         {
-          var department = ConnectDB.entity.Departments.FirstOrDefault(d => d.Business_Id == code);
-            if(department==null)
+            var department = ConnectDB.entity.Departments.FirstOrDefault(d => d.Business_Id == code);
+            if (department == null)
             {
                 return false;
             }
-          double  days = ( department.Diary_Closing_Day-department.Diary_Opening_Day).TotalDays;
+            double days = (department.Diary_Closing_Day - department.Diary_Opening_Day).TotalDays;
             var date = BusinessBL.GetBusinessById(code).LastAssigningDate;
             if (date == null) return true;
-            double daysFromLastAssigning = (DateTime.Today -date ).Value.TotalDays;
+            double daysFromLastAssigning = (DateTime.Today - date).Value.TotalDays;
             return days == daysFromLastAssigning;
         }
     }

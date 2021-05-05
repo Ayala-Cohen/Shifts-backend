@@ -114,7 +114,10 @@ namespace BL
                 //המרה לסוג של טבלת משמרות ליום
                 foreach (var item in l_shift_day)
                 {
-                    l_shifts.Add(Shift_In_DayEntity.ConvertDBToEntity(ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Shift_ID == item.shift_id && x.Day == item.day)));
+                    var shift_in_day = ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Shift_ID == item.shift_id && x.Day == item.day);
+                    var shift_in_day_entity = Shift_In_DayEntity.ConvertDBToEntity(shift_in_day);
+                    if (l_shifts.FirstOrDefault(x=>x.id == shift_in_day_entity.id) == null)
+                        l_shifts.Add(shift_in_day_entity);
                 }
                 return l_shifts;
             }

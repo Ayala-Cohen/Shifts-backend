@@ -34,7 +34,8 @@ namespace BL
         {
             try
             {
-                List<EmployeesEntity> l_employees = EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
+                var l_employees_db = ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList();
+                List<EmployeesEntity> l_employees = EmployeesEntity.ConvertListDBToListEntity(l_employees_db);
                 return l_employees;
             }
             catch (Exception)
@@ -49,16 +50,16 @@ namespace BL
             try
             {
                 //מחיקה של כל הנתונים המקושרים לשדה זה 
-                foreach (var item in ConnectDB.entity.Rating.Where(x => x.Employee_ID == id))
+                foreach (var item in ConnectDB.entity.Rating.Where(x => x.Employee_ID == id).ToList())
                 {
                     RatingBL.DeleteRating(id, item.Shift_In_Day);
                 }
 
-                foreach (var item in ConnectDB.entity.Constraints.Where(x => x.Employee_Id == id))
+                foreach (var item in ConnectDB.entity.Constraints.Where(x => x.Employee_Id == id).ToList())
                 {
                     ConstraintsBL.DeleteConstraint(item.Shift_ID, item.Day, id);
                 }
-                Employees employee_for_deleting = ConnectDB.entity.Employees.First(x => x.ID == id);
+                Employees employee_for_deleting = ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id);
                 int business_id = employee_for_deleting.Business_Id;
                 ConnectDB.entity.Employees.Remove(employee_for_deleting);
                 ConnectDB.entity.SaveChanges();
@@ -88,7 +89,7 @@ namespace BL
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex);
+                Debug.WriteLine($"בעדכון עובד{ex}");
                 return null;
             }
 
@@ -118,13 +119,15 @@ namespace BL
             try
             {
                 Dictionary<string, List<DepartmentsEntity>> l = new Dictionary<string, List<DepartmentsEntity>>();
-                var l_employees = GetAllEmployees(business_id);
-                if (l_employees != null)
+                var l_employees_db = ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList();
+                //var l_employees = GetAllEmployees(business_id);
+                if (l_employees_db != null)
                 {
-                    foreach (var employee in l_employees)
+                    foreach (var employee in l_employees_db)
                     {
-                        var l_departments = GetDepartmentsForEmployee(employee.id);
-                        l.Add(employee.id, l_departments);
+                        //var l_departments = GetDepartmentsForEmployee(employee.id);
+                        var l_departments = employee.Departments.ToList();
+                        l.Add(employee.ID, DepartmentsEntity.ConvertListDBToListEntity(l_departments));
                     }
                 }
                 return l;
@@ -204,6 +207,35 @@ namespace BL
                 return null;
             }
         }
+        public static bool CheckId(string id)
+        {
+            int sum = 0;
+            if (id.Count() == 9)
+            {
+                for (int i = 0; i < 9; i++)
+                {
+                    if (((i + 1) % 2) != 0)
+                    {
+                        sum += int.Parse(id[i].ToString());
+                    }
+                    else
+                    {
+                        int num = int.Parse(id[i].ToString()) * 2;
+                        if (num >= 10)
+                            sum += (num % 10 + (num - (num % 10)) / 10);
+                        else
+                            sum += num;
+                    }
+                }
+                return sum % 10 == 0;
+
+            }
+            return false;
+        }
+
+
+
+
         //פונקציה להכנסת נתוני עובדים מקובץ אקסל
         public static List<EmployeesEntity> ImportFromExcel(int business_id, string filePath)
         {
@@ -212,12 +244,13 @@ namespace BL
             Excel.Workbook xlworkbook = xlapp.Workbooks.Open(filePath);
             Excel._Worksheet xlworksheet = xlworkbook.Sheets[1];
             Excel.Range xlrange = xlworksheet.UsedRange;
-            List<string> deps = new List<string>();
+            List<string> deps;
             try
             {
 
                 for (int i = 2; i <= xlrange.Rows.Count; i++)
                 {
+                    deps = new List<string>();
                     for (int j = 1; j <= xlrange.Columns.Count; j++)
                     {
                         var contentObj = xlrange.Cells[i, j];
@@ -230,7 +263,8 @@ namespace BL
                             switch (header)
                             {
                                 case "מספר זהות":
-                                    e.id = currentCell;
+                                    if (CheckId(currentCell))
+                                        e.id = currentCell;
                                     break;
                                 case "שם":
                                     e.name = currentCell;
@@ -285,8 +319,9 @@ namespace BL
                 }
                 return EmployeesEntity.ConvertListDBToListEntity(ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList());
             }
-            catch
+            catch(Exception ex)
             {
+                Debug.WriteLine($"{ex}בהעתקת נתונים מקובץ אקסל");
                 return null;
             }
             finally
@@ -326,28 +361,28 @@ namespace BL
             {
                 Dictionary<string, Dictionary<int, int>> d = new Dictionary<string, Dictionary<int, int>>();
                 Dictionary<int, int> dic;
-                if (ConnectDB.entity.Satisfaction_Status.Count() != 0)
-                {//פונקציה ליצירת מילון המכיל כמפתח קוד עובד ועבור כל עובד את השכיחות של כל דירוג סטטיסטי
-
+                //if (ConnectDB.entity.Satisfaction_Status.Count() != 0)
+                //{
+                    //פונקציה ליצירת מילון המכיל כמפתח קוד עובד ועבור כל עובד את השכיחות של כל דירוג סטטיסטי
                     //רשימת העובדים בעסק ספציפי
                     var employees_of_business = GetAllEmployees(business_id);
-                    var satisfaction_status_of_specific_business = ConnectDB.entity.Satisfaction_Status.Where(x => ConnectDB.entity.Employees.FirstOrDefault(y => y.ID == x.Employee_ID).Business_Id == business_id);
+                    var satisfaction_status_of_specific_business = ConnectDB.entity.Satisfaction_Status.Where(x => ConnectDB.entity.Employees.FirstOrDefault(y => y.ID == x.Employee_ID).Business_Id == business_id).ToList();
                     var grouped_list = satisfaction_status_of_specific_business.GroupBy(x => x.Employee_ID).ToDictionary(x => x.Key);//קיבוץ לפי קוד עובד
                     foreach (var employee in employees_of_business)//מעבר על הרשימה המקובצת
                     {
-                        dic = new Dictionary<int, int>() { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 } };
+                        dic = new Dictionary<int, int>() { { 1, 0 }, { 4, 0 } };
 
                         if (grouped_list.Any(x => x.Key == employee.id))//אם לעובד יש ערכים בטבלת שביעות רצון
                         {
-                            dic.Clear();
+                            //dic.Clear();
                             foreach (var status in ConnectDB.entity.Satisfaction_Status.GroupBy(x => x.Satisfaction_Status1))//מעבר על רשימת הדירוגים הסטטיסטיים המקובצת לפי דירוג סטטיסטי
                             {
-                                dic.Add(status.Key, grouped_list[employee.id].Count(x => x.Satisfaction_Status1 == status.Key));//הוספת ערכים למילון השכיחויות  
+                                dic[status.Key] = grouped_list[employee.id].Count(x => x.Satisfaction_Status1 == status.Key);//הוספת ערכים למילון השכיחויות  
                             }
                         }
                         d.Add(employee.id, dic); //הוספת ערכים למילון הראשי
                     }
-                }
+                //}
                 return d;
             }
             catch
@@ -381,8 +416,7 @@ namespace BL
 
         }
         //פונקציה להחזרת העובד האופטימלי לשיבוץ
-        public static List<EmployeesEntity> GetOptimalEmployee(int shift_in_day_id, int role_id,
-            int min_for_perfoming, bool is_last_option)
+        public static List<EmployeesEntity> GetOptimalEmployee(int shift_in_day_id, int role_id, int min_for_perfoming, bool is_last_option)
         {
             #region oneEmployee
             //:מציאת העובד האופטימלי לשיבוץ מתנהל בצורה כזו
@@ -445,21 +479,16 @@ namespace BL
                 int shift_id, key;
                 bool is_has_constaint;
                 List<EmployeesEntity> l = new List<EmployeesEntity>();
-                //רשימת העובדים המתאימים לשיבוץ במשמרת זו
-                Dictionary<string, KeyValuePair<string, Dictionary<int, int>>> l_suitable;
+                Dictionary<string, KeyValuePair<string, Dictionary<int, int>>> l_suitable;//רשימת העובדים המתאימים לשיבוץ במשמרת זו
                 string id, day;
-                //מילון שביעות רצון
-                Dictionary<string, Dictionary<int, int>> d = AssigningBL.dic_of_satisfaction;
-                //רשימת הדירוגים מקובצת לפי משמרות
-                var grouped_by_shift = ConnectDB.entity.Rating.GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);
-                //מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
-                Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = AssigningBL.dic_shift_rating;
-                var dic_of_shift = OrderByRating(dic_shift_rating[shift_in_day_id]);
+                Dictionary<string, Dictionary<int, int>> d = AssigningBL.dic_of_satisfaction;//מילון שביעות רצון
+                var grouped_by_shift = ConnectDB.entity.Rating.GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
+                Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = AssigningBL.dic_shift_rating;//מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
+                var dic_of_shift = OrderByRating(dic_shift_rating[shift_in_day_id]);//מיון רשימת הדירוגים על מנת שישבץ קודם כל את אלו שמעדיפים, אחר כך את יכולים וכו
                 foreach (var item in dic_of_shift)//בדיקה לגבי המשמרת הספציפית
                 {
                     //שליפת העובדים שמופיעים תחת הדירוג הנוכחי מתוך המילון
-                    var specific = d.Where(x => item.Value.Any(y => y.Employee_ID == x.Key)
-                    && GetEmployeeById(x.Key).role_id == role_id);
+                    var specific = d.Where(x => item.Value.Any(y => y.Employee_ID == x.Key) && GetEmployeeById(x.Key).role_id == role_id);
 
                     if (item.Key == "מעדיף" || item.Key == "יכול")
                         key = 4;
@@ -467,29 +496,21 @@ namespace BL
                         key = 1;
                     if (specific.Count() != 0)//כאשר ישנם עובדים מאותו התפקיד תחת אותו הדירוג
                     {
-                        //שיבוץ קודם כל של אלו שיכולים ומעדיפים ואם אין
-                        // אופציה אחרת נשבץ גם את אלו בדירוגים הנמוכים יותר
-                        if (key == 4 || is_last_option)
+                        if (key == 4 || is_last_option)//שיבוץ קודם כל של אלו שיכולים ומעדיפים ואם אין אופציה אחרת נשבץ גם את אלו בדירוגים הנמוכים יותר
                         {
-                            l_suitable = d.Where(x => specific.Any(y => y.Key == x.Key)).OrderByDescending
-                                (x => x.Value[key]).ToDictionary(x => x.Key);
+                            l_suitable = d.Where(x => specific.Any(y => y.Key == x.Key)).OrderByDescending(x => x.Value[key]).ToDictionary(x => x.Key);
                             foreach (var employee in l_suitable)
                             {
                                 id = employee.Key;//מספר הזהות של העובד האופטימלי לשיבוץ הנוכחי
-                                //היום לגביו מתבצעת הבדיקה
-                                day = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Day;
-                                //המשמרת לגביה מתבצעת הבדיקה
-                                shift_id = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Shift_ID;
-                                //בדיקה האם לעובד זה יש אילוץ קבוע במשמרת זו
-                                is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault
-                                    (x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
+                                day = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Day;//היום לגביו מתבצעת הבדיקה
+                                shift_id = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Shift_ID;//המשמרת לגביה מתבצעת הבדיקה
+                                                                                                                        //בדיקה האם לעובד זה יש אילוץ קבוע במשמרת זו
+                                is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault(x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
                                 //עדיין לא שובץ בכל המשמרות שעליו לבצע ואין לו אילוץ קבוע במשמרת זו וכן שהוא לא משובץ כבר במשמרת זו 
                                 if (!CheckIfAssignedInAllShifts(id) && !is_has_constaint && !CheckIfAssignedInShift(shift_in_day_id, id))
                                 {
-                                    //הוספה לרשימה הסופית של העובדים האופטימליים
-                                    l.Add(EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id)));
-                                    //כאשר נמצאו מספר עובדים מתאימים לפי מספר העובדים הנדרשים למשמרת זו מאותו התפקיד
-                                    if (l.Count() == min_for_perfoming)
+                                    l.Add(EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id)));//הוספה לרשימה הסופית של העובדים האופטימליים
+                                    if (l.Count() == min_for_perfoming)//כאשר נמצאו מספר עובדים מתאימים לפי מספר העובדים הנדרשים למשמרת זו מאותו התפקיד
                                         return l;
                                 }
                             }
@@ -498,8 +519,9 @@ namespace BL
                 }
                 return l;
             }
-            catch
+            catch(Exception e)
             {
+                Debug.WriteLine($"במציאת עובדים אופטימלים\n{e}");
                 return null;
             }
 
