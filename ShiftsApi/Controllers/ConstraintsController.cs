@@ -20,6 +20,20 @@ namespace ShiftsApi.Controllers
         {
             return ConstraintsBL.GetAllConstraint(employee_id);
         }
+        [Route("GetNumberOfConstraintsPerShift/{business_id}")]
+        [HttpGet]
+        //פונקציה להחזרת רשימת אילוצים למשמרות
+        public Dictionary<int, Dictionary<int, int>> GetNumberOfConstraintsPerShift(int business_id)
+        {
+            return ConstraintsBL.GetNumberOfConstraintsPerShift(business_id);
+        }
+        [Route("GetLimitForConstraint/{business_id}/{role_id}")]
+        [HttpGet]
+        //פונקציה להחזרת הגבלה לאילוץ
+        public int GetLimitForConstraint(int business_id, int role_id)
+        {
+            return ConstraintsBL.GetLimitForConstraint(business_id, role_id);
+        }
 
         //פונקציה להחזרת אילוץ ע"י קוד
         [Route("GetConstraintById/{s_id}/{e_id}")]
