@@ -120,14 +120,19 @@ namespace BL
             {
                 Dictionary<string, List<DepartmentsEntity>> l = new Dictionary<string, List<DepartmentsEntity>>();
                 var l_employees_db = ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList();
-                //var l_employees = GetAllEmployees(business_id);
+                List<DepartmentsEntity> departments_to_employee;
                 if (l_employees_db != null)
                 {
+                    var l_departments_employees = ConnectDB.entity.get_employee_in_department().ToList();
                     foreach (var employee in l_employees_db)
                     {
-                        //var l_departments = GetDepartmentsForEmployee(employee.id);
-                        var l_departments = employee.Departments.ToList();
-                        l.Add(employee.ID, DepartmentsEntity.ConvertListDBToListEntity(l_departments));
+                        departments_to_employee = new List<DepartmentsEntity>();
+                        //var l_departments = employee.Departments.ToList();
+                        foreach (var e_department in l_departments_employees.Where(x=>x.Employee_ID == employee.ID))
+                        {
+                            departments_to_employee.Add(DepartmentsBL.GetDepartmentById(e_department.Departments_ID));
+                        }
+                        l.Add(employee.ID, departments_to_employee);
                     }
                 }
                 return l;
@@ -418,57 +423,6 @@ namespace BL
         //פונקציה להחזרת העובד האופטימלי לשיבוץ
         public static List<EmployeesEntity> GetOptimalEmployee(int shift_in_day_id, int role_id, int min_for_perfoming, bool is_last_option)
         {
-            #region oneEmployee
-            //:מציאת העובד האופטימלי לשיבוץ מתנהל בצורה כזו
-            //בדירוג מעדיף ויכול בתחילה נחפש את מי שהדירוג הסטטיסטי הגרוע ביותר מופיע אצלו הכי הרבה פעמים
-            //אם נראה שישנם כמה כאלה, נבדוק מי הוא העובד שהדירוג הסטטיסטי הגבוה ביותר מופיע אצלו הכי הרבה פעמים
-            //(ואותו נרצה להחזיר (מכיוון שברוב הפעמים הוא היה מרוצה
-            //במידה וישנם כמה עובדים שדירוג סטטיסטי זה שכיח אצלם במידה שווה נחזיר אחד מבינהם, לא משנה הסדר
-            //בדירוג מעדיף שלא ולא יכול נעשה את אותו התהליך הפוך - קודם נבדוק מי היה מרוצה רוב הפעמים 
-            //ואותו נרצה להחזיר. במידה וישנם כמה כאלה נחזיר את הראשון שהיה הכי פחות פעמים לא מרוצה
-            //int min, shift_id, max, key;
-            //bool is_has_constaint;
-            //string id, day;
-            //Dictionary<string, Dictionary<int, int>> d = AssigningBL.dic_of_satisfaction;
-            //var grouped_by_shift = ConnectDB.entity.Rating.GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);
-            //Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = new Dictionary<int, Dictionary<string, IGrouping<string, Rating>>>();
-            //foreach (var item in grouped_by_shift)
-            //{
-            //    var grouped_by_rating = item.Value.GroupBy(x => x.Rating1).ToDictionary(x => x.Key);
-            //    dic_shift_rating.Add(item.Key, grouped_by_rating);
-            //}
-            //foreach (var item in dic_shift_rating[shift_in_day_id])//בדיקה לגבי המשמרת הספציפית
-            //{
-            //    if (item.Value.Count() != 0) //רשימה לא ריקה
-            //    {
-            //        //שליפת העובדים שמופיעים תחת דירוג מסוים מתוך המילון
-            //        var specific = d.Where(x => item.Value.Any(y => y.Employee_ID == x.Key));
-            //        if (item.Key == "מעדיף" || item.Key == "יכול")
-            //            key = 4;
-            //        else//דירוג לא יכול או מעדיף שלא
-            //            key = 1;
-
-            //        max = specific.Max(x => x.Value[key]);//השכיחות הגבוהה ביותר של הדירוג הנמוך או הגבוה(לפי המפתח) ביותר
-            //        var l_suitable = d.Where(x => x.Value[key] == max && specific.Any(y => y.Key == x.Key) && GetEmployeeById(x.Key).role_id == role_id);//רשימת העובדים עם הדירוג הנמוך או הגבוה ביותר ושבהם צריך להתחשב הכי הרבה
-            //        if (l_suitable.Count() > 1)//אם מדובר בכמה עובדים
-            //        {
-            //            //חיפוש מתוך אלו ששווים למי שכיחות הדירוג הסטטיסטי הגבוה ביותר יותר נמוכה
-            //            //או למי שכיחות הדירוג הנמוך ביותר יותר נמוכה בהתאמה
-            //            min = l_suitable.Min(x => x.Value[5 - key]);
-            //            l_suitable = d.Where(x => x.Value[5 - key] == min);
-            //        }
-            //        id = l_suitable.FirstOrDefault().Key;//מספר הזהות של העובד האופטימלי לשיבוץ
-            //        //היום והמשמרת לגביהם מדובר השיבוץ
-            //        day = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Day;
-            //        shift_id = ConnectDB.entity.Shifts_In_Days.First(x => x.ID == shift_in_day_id).Shift_ID;
-            //        //בדיקה האם לעובד זה יש אילוץ קבוע במשמרת זו
-            //        is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault(x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
-            //        if (GetEmployeesToAssigning()[id] != 0 && !is_has_constaint) //עדיין לא שובץ בכל המשמרות שעליו לבצע ואין לו אילוץ קבוע במשמרת זו
-            //            return EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id));
-            //    }
-            //}
-            //return null;
-            #endregion
             #region listEmployees
             try
             {

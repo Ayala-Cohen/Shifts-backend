@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Http;
 using BL;
 using Entity;
+using DAL;
 
 namespace ShiftsApi.Controllers
 {
@@ -51,11 +52,51 @@ namespace ShiftsApi.Controllers
             return BusinessBL.AddBusiness(b);
         }
 
+        [Route("saveLogo/{business_id}")]
+        [HttpPost]
+        public string SaveLogo(int business_id)
+        {
+            var httpRequest = HttpContext.Current.Request;
+            var postedFile = httpRequest.Files["Logo"];
+            string filePath = @"D:\Ayala\FinalProject\Shifts\src\assets\images\";
+            string fileName ="";
+            if (postedFile != null)
+            {
+                string name = postedFile.FileName;
+                name = name.Substring(0, name.IndexOf('.'));
+                fileName = name + business_id.ToString() + Path.GetExtension(postedFile.FileName);
+                filePath = @"D:\Ayala\FinalProject\Shifts\src\assets\images\" + fileName;
+                if (!File.Exists(filePath))
+                {
+                    postedFile.SaveAs(filePath);
+                }
+            }
+            return fileName;
+        }
+
         [Route("GetBusinessBydirectorDetails/{email}/{password}")]
         [HttpGet]
         public BusinessEntity GetBusinessBydirectorDetails(string email, string password)
         {
             return BusinessBL.GetBusinessBydirectorDetails(email, password);
+        }
+        [Route("GetLogo/{business_id}")]
+        [HttpPost]
+        public string GetLogo(int business_id)
+        {
+            var httpRequest = HttpContext.Current.Request;
+            var postedFile = httpRequest.Files["Logo"];
+            string filePath = "";
+            if (postedFile != null)
+            {
+                string name = postedFile.FileName;
+                name = name.Substring(0, name.IndexOf('.'));
+                var fileName = name + business_id.ToString() + Path.GetExtension(postedFile.FileName);
+                filePath = HttpContext.Current.Server.MapPath(@"~/Files/images/" + fileName);
+                if (!File.Exists(filePath))
+                    postedFile.SaveAs(filePath);
+            }
+            return filePath;
         }
     }
 }

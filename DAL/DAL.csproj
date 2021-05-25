@@ -69,6 +69,9 @@
     <Compile Include="Employee_Roles.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="get_employee_in_department_Result.cs">
+      <DependentUpon>ShiftDB.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Rating.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>

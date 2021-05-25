@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,8 +33,9 @@ namespace BL
                 List<BusinessEntity> l_business = BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
                 return l_business;
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Debug.WriteLine(e);
             }
             return null;
         }
@@ -89,13 +91,14 @@ namespace BL
                 business_for_updating.User_Name = b.user_name;
                 ConnectDB.entity.SaveChanges();
                 return BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
-            }
-            catch (Exception)
+        }
+            catch (Exception e)
             {
+                Debug.WriteLine(e);
                 return null;
             }
 
-        }
+}
 
 
         //פונקציה להוספת עסק
@@ -105,10 +108,13 @@ namespace BL
             {
                 ConnectDB.entity.Business.Add(BusinessEntity.ConvertEntityToDB(b));
                 ConnectDB.entity.SaveChanges();
+                return BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
             }
-            catch { }
-
-            return BusinessEntity.ConvertListDBToListEntity(ConnectDB.entity.Business.ToList());
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return null;
+            }
         }
 
         //פונקציה לשליפת פרטי עסק על ידי פרטי מנהל
@@ -117,7 +123,7 @@ namespace BL
             try
             {
                 Business b = ConnectDB.entity.Business.FirstOrDefault(x => x.User_Name == email && x.Password == password);
-                if(b != null)
+                if (b != null)
                     return BusinessEntity.ConvertDBToEntity(b);
                 return null;
             }

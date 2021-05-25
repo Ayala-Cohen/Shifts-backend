@@ -21,12 +21,12 @@
           </Key>
           <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Name" Type="varchar" MaxLength="50" Nullable="false" />
-          <Property Name="Logo" Type="image" />
           <Property Name="User_Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Password" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Full_Name" Type="varchar" MaxLength="50" Nullable="false" />
           <Property Name="Number" Type="int" Nullable="false" />
           <Property Name="LastAssigningDate" Type="datetime" />
+          <Property Name="Logo" Type="varchar" MaxLength="100" />
         </EntityType>
         <EntityType Name="Constraints">
           <Key>
@@ -358,6 +358,7 @@
           <Parameter Name="employee_id" Type="nvarchar" Mode="In" />
           <Parameter Name="department_id" Type="int" Mode="In" />
         </Function>
+        <Function Name="get_employee_in_department" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="ShiftsModelStoreContainer">
           <EntitySet Name="Assigning" EntityType="Self.Assigning" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Business" EntityType="Self.Business" Schema="dbo" store:Type="Tables" />
@@ -470,7 +471,7 @@
           </Key>
           <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
-          <Property Name="Logo" Type="Binary" MaxLength="Max" FixedLength="false" />
+          <Property Name="Logo" Type="String" Nullable="true" MaxLength="100" Unicode="false" FixedLength="false" />
           <Property Name="User_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="Password" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Full_Name" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
@@ -897,7 +898,12 @@
             <Parameter Name="employee_id" Mode="In" Type="String" />
             <Parameter Name="department_id" Mode="In" Type="Int32" />
           </FunctionImport>
+          <FunctionImport Name="get_employee_in_department" ReturnType="Collection(ShiftsModel.get_employee_in_department_Result)" />
         </EntityContainer>
+        <ComplexType Name="get_employee_in_department_Result">
+          <Property Type="String" Name="Employee_ID" Nullable="false" MaxLength="50" />
+          <Property Type="Int32" Name="Departments_ID" Nullable="false" />
+        </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -1029,6 +1035,14 @@
             </EndProperty>
           </AssociationSetMapping>
           <FunctionImportMapping FunctionImportName="add_employee_in_department" FunctionName="ShiftsModel.Store.add_employee_in_department" />
+          <FunctionImportMapping FunctionImportName="get_employee_in_department" FunctionName="ShiftsModel.Store.get_employee_in_department">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ShiftsModel.get_employee_in_department_Result">
+                <ScalarProperty Name="Employee_ID" ColumnName="Employee_ID" />
+                <ScalarProperty Name="Departments_ID" ColumnName="Departments_ID" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

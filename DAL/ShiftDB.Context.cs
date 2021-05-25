@@ -51,5 +51,10 @@ namespace DAL
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("add_employee_in_department", employee_idParameter, department_idParameter);
         }
+    
+        public virtual ObjectResult<get_employee_in_department_Result> get_employee_in_department()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<get_employee_in_department_Result>("get_employee_in_department");
+        }
     }
 }
