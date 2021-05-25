@@ -74,6 +74,8 @@ namespace BL
         //פונקציית שיבוץ
         public static List<AssigningEntity> AssigningActivity(int business_id)
         {
+            //מחיקת טבלת שיבוץ 
+            clearAssigning(business_id);
             dic_of_satisfaction = EmployeesBL.CreateDictionaryOfSatisfaction(business_id);//יצירת מילון שביעות רצון לכל עובד
             int min_for_performing, len_of_optimal;//משתנים שמכילים את מספר המשמרות המינימלי ההכרחי לביצוע וכן את אורך הרשימה של העובדים האופטימליים לשיבוץ
             bool is_last_option = false;//משתנה שמסמל האם נהיה מוכרחים לשבץ גם עובדים שאינם יכולים או מעדיפים שלא
@@ -98,78 +100,84 @@ namespace BL
                     {
                         is_last_option = false;//בתחילת כל שיבוץ קודם כל נשבץ את אלו שיכולים ולכן נאתחל משתנה זה כלא מתקיים
                         min_for_performing = role.number_of_shift_employees;//מספר העובדים מהתפקיד הנדרשים לכל משמרת
-                        if (min_for_performing != 0)
+                        var l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);//שליפת רשימת העובדים האופטימליים לתפקיד זה
+                        len_of_optimal = l_employees.Count;//אורך רשימת האופטימליים על מנת לבדוק שאכן עמדנו במספר הנדרש
+                        while (len_of_optimal != min_for_performing)//כל עוד לא שובצו עובדים כמספר המינימלי הנדרש
                         {
-                            var l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);//שליפת רשימת העובדים האופטימליים לתפקיד זה
-                            len_of_optimal = l_employees.Count;//אורך רשימת האופטימליים על מנת לבדוק שאכן עמדנו במספר הנדרש
-                            while (len_of_optimal < min_for_performing)//כל עוד לא שובצו עובדים כמספר המינימלי הנדרש
+                            if (currentAssigning.Count == 0)//אם בפעם הראשונה של השיבוץ לא נמצאו עובדים כמכסה המינימלית
                             {
-                                if (currentAssigning.Count == 0)//אם בפעם הראשונה של השיבוץ לא נמצאו עובדים כמכסה המינימלית
+                                is_last_option = true;//עדכון משתנה "אין ברירה" לחיובי
+                                l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);//שליחה שוב למציאת עובדים אופטימליים כאשר כרגע יאפשר לשבץ גם עובדים שאינם יכולים 
+                                len_of_optimal = l_employees.Count;
+                            }
+                            else//לא מדובר בפעם הראשונה ולא עמדנו במספר הנדרש
+                            {
+                                var dic_rating_can_prefere = dic_shift_rating[shift_in_day.id].Where(y => y.Key == "יכול" || y.Key == "מעדיף");//שליפת הדירוגים מעדיף ויכול למשמרת זו
+                                foreach (var a in currentAssigning.ToList())//מעבר על השיבוץ המקומי על מנת לבדוק האם ישנו עובד שאם נזיז אותו למשמרת אחרת נצליח לשבץ את מספר העובדים הנדרש
                                 {
-                                    is_last_option = true;//עדכון משתנה "אין ברירה" לחיובי
-                                    l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);//שליחה שוב למציאת עובדים אופטימליים כאשר כרגע יאפשר לשבץ גם עובדים שאינם יכולים 
-                                    len_of_optimal = l_employees.Count;
-                                }
-                                else//לא מדובר בפעם הראשונה ולא עמדנו במספר הנדרש
-                                {
-                                    var dic_rating_can_prefere = dic_shift_rating[shift_in_day.id].Where(y => y.Key == "יכול" || y.Key == "מעדיף");//שליפת הדירוגים מעדיף ויכול למשמרת זו
-                                    foreach (var a in currentAssigning.ToList())//מעבר על השיבוץ המקומי על מנת לבדוק האם ישנו עובד שאם נזיז אותו למשמרת אחרת נצליח לשבץ את מספר העובדים הנדרש
+                                    var l_assigned_with_high_rating = dic_rating_can_prefere.Where(x => x.Value.Any(y => y.Employee_ID == a.employee_id) && !l_employees.Any(y => y.id == a.employee_id));//שליפת הדירוגים של העובד שעליו אנו מבצעים את הבדיקה בתנאי שהוא לא מועמד מלכתחילה לשיבוץ במשמרת זו
+                                    l_assigned_with_high_rating = l_assigned_with_high_rating.Where(x => EmployeesBL.GetEmployeeById(a.employee_id).role_id == role.role_id);//הגבלה לשורה הקודמת - רק אם העובד מאותו התפקיד שאנו מנסים לשבץ כרגע
+                                    if (l_assigned_with_high_rating.Count() != 0)// בדיקה שאכן לעובד הנוכחי היה דירוג גבוה למשמרת זו
                                     {
-                                        var l_assigned_with_high_rating = dic_rating_can_prefere.Where(x => x.Value.Any(y => y.Employee_ID == a.employee_id) && !l_employees.Any(y => y.id == a.employee_id));//שליפת הדירוגים של העובד שעליו אנו מבצעים את הבדיקה בתנאי שהוא לא מועמד מלכתחילה לשיבוץ במשמרת זו
-                                        l_assigned_with_high_rating = l_assigned_with_high_rating.Where(x => EmployeesBL.GetEmployeeById(a.employee_id).role_id == role.role_id);//הגבלה לשורה הקודמת - רק אם העובד מאותו התפקיד שאנו מנסים לשבץ כרגע
-                                        if (l_assigned_with_high_rating.Count() != 0)// בדיקה שאכן לעובד הנוכחי היה דירוג גבוה למשמרת זו
+                                        l_for_replace = EmployeesBL.GetOptimalEmployee(a.shift_in_day_id, role.role_id, role.number_of_shift_employees, is_last_option);//שליחה לפונקציה על מנת לקבל רשימת עובדים להחלפה במשמרת של העובד שנרצה להחליפו
+                                        if (l_for_replace.Count() != 0)//בדיקה האם במשמרת של העובד שאותו נזיז יש מישהו להחלפה
                                         {
-                                            l_for_replace = EmployeesBL.GetOptimalEmployee(a.shift_in_day_id, role.role_id, role.number_of_shift_employees, is_last_option);//שליחה לפונקציה על מנת לקבל רשימת עובדים להחלפה במשמרת של העובד שנרצה להחליפו
-                                            if (l_for_replace.Count() != 0)//בדיקה האם במשמרת של העובד שאותו נזיז יש מישהו להחלפה
+                                            earlier_assigning = a;//שמירת הערך מרשימת השיבוץ המקומי למשתנה
+                                            currentAssigning.Remove(a);//הסרתו מהרשימה
+                                            UpdateShiftApproved(false, earlier_assigning.employee_id, shift_in_day.id);//עדכון שהמשמרת לא התקבלה בסופו של דבר
+                                            RatingBL.UpdateStatusLocal(shift_in_day.id);
+                                            var employee_for_replace = l_for_replace.First();
+                                            //הוספה לשיבוץ המקומי
+                                            currentAssigning.Add(new AssigningEntity() { shift_in_day_id = a.shift_in_day_id, employee_id = employee_for_replace.id, department_id = a.department_id });
+                                            UpdateShiftApproved(true, employee_for_replace.id, a.shift_in_day_id);
+                                            RatingBL.UpdateStatusLocal(shift_in_day.id);
+                                            l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);//חיפוש לאחר השינוי
+                                            len_of_optimal = l_employees.Count;
+                                            if (len_of_optimal == min_for_performing)//ההחלפה הועילה
                                             {
-                                                earlier_assigning = a;//שמירת הערך מרשימת השיבוץ המקומי למשתנה
-                                                currentAssigning.Remove(a);//הסרתו מהרשימה
-                                                UpdateShiftApproved(false, earlier_assigning.employee_id, shift_in_day.id);//עדכון שהמשמרת לא התקבלה בסופו של דבר
+                                                is_found_with_only_can_employees = true;//הצלחנו למצוא עובדים בלי לשבץ כאלה שאינם יכולים
+                                                break;//יציאה מלולאת החיפוש על מנת לעבור לתפקיד הבא
+                                            }
+                                            else//לא הועילה ההחלפה
+                                            {
+                                                local_assigning.Add(earlier_assigning);//נוסיף משתנה זה לרשימה מקומית כדי שלא תווצר לולאה אינסופית מכיון שרשימת השיבוץ מתעדכנת כל הזמן
+                                                UpdateShiftApproved(true, earlier_assigning.employee_id, earlier_assigning.shift_in_day_id);
                                                 RatingBL.UpdateStatusLocal(shift_in_day.id);
-                                                var employee_for_replace = l_for_replace.First();
-                                                //הוספה לשיבוץ המקומי
-                                                currentAssigning.Add(new AssigningEntity() { shift_in_day_id = a.shift_in_day_id, employee_id = employee_for_replace.id, department_id = a.department_id });
-                                                UpdateShiftApproved(true, employee_for_replace.id, a.shift_in_day_id);
+                                                // הסרת העובד החדש ששבצנו מרשימת השיבוץ
+                                                currentAssigning.Remove(currentAssigning.First(x => x.shift_in_day_id == earlier_assigning.shift_in_day_id && x.employee_id == employee_for_replace.id));
+                                                UpdateShiftApproved(false, employee_for_replace.id, earlier_assigning.shift_in_day_id);
                                                 RatingBL.UpdateStatusLocal(shift_in_day.id);
-                                                l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);//חיפוש לאחר השינוי
-                                                len_of_optimal = l_employees.Count;
-                                                if (len_of_optimal == min_for_performing)//ההחלפה הועילה
-                                                {
-                                                    is_found_with_only_can_employees = true;//הצלחנו למצוא עובדים בלי לשבץ כאלה שאינם יכולים
-                                                    break;//יציאה מלולאת החיפוש על מנת לעבור לתפקיד הבא
-                                                }
-                                                else//לא הועילה ההחלפה
-                                                {
-                                                    local_assigning.Add(earlier_assigning);//נוסיף משתנה זה לרשימה מקומית כדי שלא תווצר לולאה אינסופית מכיון שרשימת השיבוץ מתעדכנת כל הזמן
-                                                    UpdateShiftApproved(true, earlier_assigning.employee_id, earlier_assigning.shift_in_day_id);
-                                                    RatingBL.UpdateStatusLocal(shift_in_day.id);
-                                                    // הסרת העובד החדש ששבצנו מרשימת השיבוץ
-                                                    currentAssigning.Remove(currentAssigning.First(x => x.shift_in_day_id == earlier_assigning.shift_in_day_id && x.employee_id == employee_for_replace.id));
-                                                    UpdateShiftApproved(false, employee_for_replace.id, earlier_assigning.shift_in_day_id);
-                                                    RatingBL.UpdateStatusLocal(shift_in_day.id);
-                                                }
                                             }
                                         }
-                                        if (a == currentAssigning.Last() || l_for_replace.Count() == 0)//אם החלפה לא הועילה או שאין אפשרות להחליף
-                                        {
-                                            is_last_option = true;//עדכון משתנה "אין ברירה" לחיובי
-                                                                  //אם הפונקציה מגיעה לכאן הווי אומר שאי אפשר להתחשב בשום צורה בעובדים שדרגו משמרת כמעדיף שלא ולא יכול
-                                                                  //(ולכן נאלץ לשבץ אותם על אף שהם אינם יכולים (כמובן שנשבץ את מי שהיה הכי מרוצה מביניהם
-                                            l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);
-                                            len_of_optimal = l_employees.Count;
-                                            if (len_of_optimal == min_for_performing)
-                                                break;
-                                        }
                                     }
-                                    if (!is_found_with_only_can_employees)//נאלצנו לשבץ עובדים שאינם יכולים
-                                        currentAssigning.AddRange(local_assigning);//החזרת המצב לקדמותו - רק אם ההחלפה לא הועילה
+                                    //אם החלפה לא הועילה או שאין אפשרות להחליף
+                                    if (a == currentAssigning.Last() || l_for_replace.Count() == 0)
+                                    {
+                                        is_last_option = true;//עדכון משתנה "אין ברירה" לחיובי
+                                        //אם הפונקציה מגיעה לכאן הווי אומר שאי אפשר להתחשב בשום
+                                        //צורה בעובדים שדרגו משמרת כמעדיף שלא ולא יכול
+                                        //(ולכן נאלץ לשבץ אותם על אף שהם אינם יכולים (כמובן שנשבץ את מי שהיה הכי מרוצה מביניהם
+                                        l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id,
+                                            role.role_id, min_for_performing, is_last_option);
+                                        len_of_optimal = l_employees.Count;
+                                        if (len_of_optimal == min_for_performing)
+                                            break;
+                                    }
                                 }
+                                if (!is_found_with_only_can_employees)//נאלצנו לשבץ עובדים שאינם יכולים
+                                    currentAssigning.AddRange(local_assigning);//החזרת המצב לקדמותו - רק אם ההחלפה לא הועילה
                             }
-                            foreach (var e in l_employees)//עדכון בשיבוץ המקומי כאשר נמצאו עובדים לשיבוץ 
+                        }
+                        foreach (var e in l_employees)//עדכון בשיבוץ המקומי כאשר נמצאו עובדים לשיבוץ 
+                        {
+                            currentAssigning.Add(new AssigningEntity
                             {
-                                currentAssigning.Add(new AssigningEntity { department_id = dep.id, employee_id = e.id, shift_in_day_id = shift_in_day.id });
-                                UpdateShiftApproved(true, e.id, shift_in_day.id);
-                            }
+                                department_id
+                                = dep.id,
+                                employee_id = e.id,
+                                shift_in_day_id = shift_in_day.id
+                            });
+                            UpdateShiftApproved(true, e.id, shift_in_day.id);
                         }
                     }
                     //עדכון לטבלת שביעות רצון ע"מ שלא נתחשב פעמים באותו עובד
@@ -191,6 +199,10 @@ namespace BL
             RatingBL.SetStatus();//עדכון טבלת שביעות רצון
 
             ConnectDB.entity.SaveChanges();
+            //אתחול טבלת דרוגים
+            clearRating(business_id);
+           //עדכון תאריכי פתיחת יומן וסגירת ימן
+            updatedicdate(business_id);
             return GetAssigning(business_id);
         }
 
@@ -263,5 +275,36 @@ namespace BL
             }
 
         }
+
+        //אתחול/מחיקה טבלת דרוגים
+        public static void clearRating(int business_id)
+        {
+            var Employees_in_business = ConnectDB.entity.Employees.Where(e => e.Business_Id == business_id);
+            var rating = ConnectDB.entity.Rating.Where(b => Employees_in_business.Contains(b.Employees));
+            ConnectDB.entity.Rating.RemoveRange(rating);
+            ConnectDB.entity.SaveChanges();
+        }
+
+        //אתחול/מחיקה טבלת שיבוץ
+        public static void clearAssigning(int business_id)
+        {
+            var Employees_in_business = ConnectDB.entity.Employees.Where(e => e.Business_Id == business_id).Select(s=>s.ID);
+            var assigning=  ConnectDB.entity.Assigning.Where(a => Employees_in_business.Contains(a.Employee_ID));
+            ConnectDB.entity.Assigning.RemoveRange(assigning);
+            ConnectDB.entity.SaveChanges();
+        }
+
+        //עדכון פתיחת יומן וסגירת יומן
+        public static void updatedicdate( int business_id)
+        {
+            var departments = ConnectDB.entity.Business.FirstOrDefault(b => b.ID == business_id).Departments;
+            //הפרש הימים
+            double days = (departments.First ().Diary_Closing_Day - departments.First().Diary_Opening_Day).TotalDays;
+            departments.ToList().ForEach(d => { d.Diary_Opening_Day = d.Diary_Opening_Day.AddDays(days); d.Diary_Closing_Day = d.Diary_Closing_Day.AddDays(days); });
+            ConnectDB.entity.SaveChanges();
+
+        }
+
+
     }
 }
