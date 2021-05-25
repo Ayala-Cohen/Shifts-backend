@@ -97,5 +97,12 @@ namespace ShiftsApi.Controllers
             }
             return EmployeesBL.ImportFromExcel(business_id, filePath);
         }
+        [Route("SendCheckingEmailToEmployees/{subject}/{message}/{num}")]
+        [HttpPost]
+        public void SendSendCheckingEmailToEmployees([FromBody] List<EmployeesEntity> l_employees, string message, string subject, int num)
+        {
+            var l_employees_db = EmployeesEntity.ConvertListEntityToListDB(l_employees);
+            EmployeesBL.SendEmail(l_employees, subject, message);
+        }
     }
 }

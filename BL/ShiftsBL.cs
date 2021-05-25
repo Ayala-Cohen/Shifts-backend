@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -65,8 +66,9 @@ namespace BL
                 return Shift_In_DayEntity.ConvertListDBToListEntity(l);
 
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Debug.WriteLine(e);
                 return null;
             }
         }

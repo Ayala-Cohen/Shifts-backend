@@ -134,8 +134,8 @@ namespace BL
                             break;
                     }
                     ConnectDB.entity.Satisfaction_Status.Add(Satisfaction_StatusEntity.ConvertEntityToDB(s));
-                    ConnectDB.entity.SaveChanges();
                 }
+                ConnectDB.entity.SaveChanges();
                 return Satisfaction_StatusEntity.ConvertListDBToListEntity(ConnectDB.entity.Satisfaction_Status.ToList());
             }
             catch (Exception e)

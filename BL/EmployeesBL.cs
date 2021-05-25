@@ -127,12 +127,12 @@ namespace BL
                     foreach (var employee in l_employees_db)
                     {
                         departments_to_employee = new List<DepartmentsEntity>();
-                        //var l_departments = employee.Departments.ToList();
                         foreach (var e_department in l_departments_employees.Where(x=>x.Employee_ID == employee.ID))
                         {
                             departments_to_employee.Add(DepartmentsBL.GetDepartmentById(e_department.Departments_ID));
                         }
-                        l.Add(employee.ID, departments_to_employee);
+                        if(!l.Keys.Contains(employee.ID))
+                            l.Add(employee.ID, departments_to_employee);
                     }
                 }
                 return l;
@@ -514,7 +514,7 @@ namespace BL
         }
 
         //פונקציה לשליחת אמייל , הפונקציה מקבלת את הנושא ואת המסר לשליחה
-        public static void SendEmailOfQuestion(List<EmployeesEntity> l, string subject, string message)
+        public static void SendEmail(List<EmployeesEntity> l, string subject, string message)
         {
             try
             {

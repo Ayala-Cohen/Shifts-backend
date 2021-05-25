@@ -20,18 +20,36 @@ namespace ShiftsApi.Controllers
         }
 
         //פונקציה להחזרת העובדים שדירגו משמרת מסוימת בדירוג גבוה על מנת לערוך את השיבוץ
-        [Route("GetEmployeesWithHighRating/{business_id}/{shift_id}")]
+        [Route("GetEmployeesForReplacing/{business_id}/{shift_id}")]
         [HttpGet]
-        public Dictionary<int, List<EmployeesEntity>> GetEmployeesWithHighRating(int business_id, int shift_id)
+        public Dictionary<int, List<EmployeesEntity>> GetEmployeesForReplacing(int business_id, int shift_id)
         {
-            return AssigningBL.GetEmployeesWithHighRating(business_id, shift_id);
+            return AssigningBL.GetEmployeesForReplacing(business_id, shift_id);
         }
 
+        [Route("ActivateAssigning/{business_id}")]
+        [HttpGet]
         //פונקציה להפעלת שיבוץ
         public List<AssigningEntity> ActivateAssigning(int business_id)
         {
             AssigningBL.AssigningActivity(business_id);
             return GetAssigning(business_id);
         }
+
+        //פונקציה לעריכת שיבוץ
+        [Route("EditAssigning/{employee_id_replacing}")]
+        [HttpPost]
+        public List<AssigningEntity> EditAssigning(string employee_id_replacing, [FromBody] AssigningEntity assinging_for_editing)
+        {
+            return AssigningBL.EditAssiging(assinging_for_editing, employee_id_replacing);
+        }
+
+        [Route("GetAssingingByRoles/{shift_in_day_id}/{department_id}")]
+        [HttpGet]
+        public Dictionary<int, List<EmployeesEntity>> GetAssingingByRoles(int shift_in_day_id, int department_id)
+        {
+            return AssigningBL.GetAssingingByRoles(shift_in_day_id, department_id);
+        }
+
     }
 }
