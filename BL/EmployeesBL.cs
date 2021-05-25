@@ -559,8 +559,10 @@ namespace BL
             }
         }
 
+
         //פונקציה לשליחת אמייל , הפונקציה מקבלת את הנושא ואת המסר לשליחה
-        public static void SendEmailOfQuestion(List<EmployeesEntity> l, string subject, string message)
+        //שיניתי שיקבל מסוג עובדEmployees ולא EmployeesEntity  
+        public static void SendEmailOfQuestion(List<Employees> l, string subject, string message)
         {
             try
             {
@@ -569,7 +571,7 @@ namespace BL
                     using (MailMessage mail = new MailMessage())
                     {
                         mail.From = new MailAddress("shiftssystem98@gmail.com");
-                        mail.To.Add(item.email);
+                        mail.To.Add(item.Email);
                         mail.Subject = subject;
                         mail.Body = message;
                         mail.IsBodyHtml = true;

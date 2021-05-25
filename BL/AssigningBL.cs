@@ -58,6 +58,8 @@ namespace BL
         //פונקציית שיבוץ
         public static List<AssigningEntity> AssigningActivity(int business_id)
         {
+            //מחיקת טבלת שיבוץ 
+            clearAssigning(business_id);
             dic_of_satisfaction = EmployeesBL.CreateDictionaryOfSatisfaction(business_id);//יצירת מילון שביעות רצון לכל עובד
             int min_for_performing, len_of_optimal;//משתנים שמכילים את מספר המשמרות המינימלי ההכרחי לביצוע וכן את אורך הרשימה של העובדים האופטימליים לשיבוץ
             bool is_last_option = false;//משתנה שמסמל האם נהיה מוכרחים לשבץ גם עובדים שאינם יכולים או מעדיפים שלא
@@ -132,12 +134,15 @@ namespace BL
                                             }
                                         }
                                     }
-                                    if (a == currentAssigning.Last() || l_for_replace.Count() == 0)//אם החלפה לא הועילה או שאין אפשרות להחליף
+                                    //אם החלפה לא הועילה או שאין אפשרות להחליף
+                                    if (a == currentAssigning.Last() || l_for_replace.Count() == 0)
                                     {
                                         is_last_option = true;//עדכון משתנה "אין ברירה" לחיובי
-                                        //אם הפונקציה מגיעה לכאן הווי אומר שאי אפשר להתחשב בשום צורה בעובדים שדרגו משמרת כמעדיף שלא ולא יכול
+                                        //אם הפונקציה מגיעה לכאן הווי אומר שאי אפשר להתחשב בשום
+                                        //צורה בעובדים שדרגו משמרת כמעדיף שלא ולא יכול
                                         //(ולכן נאלץ לשבץ אותם על אף שהם אינם יכולים (כמובן שנשבץ את מי שהיה הכי מרוצה מביניהם
-                                        l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id, role.role_id, min_for_performing, is_last_option);
+                                        l_employees = EmployeesBL.GetOptimalEmployee(shift_in_day.id,
+                                            role.role_id, min_for_performing, is_last_option);
                                         len_of_optimal = l_employees.Count;
                                         if (len_of_optimal == min_for_performing)
                                             break;
@@ -149,7 +154,13 @@ namespace BL
                         }
                         foreach (var e in l_employees)//עדכון בשיבוץ המקומי כאשר נמצאו עובדים לשיבוץ 
                         {
-                            currentAssigning.Add(new AssigningEntity { department_id = dep.id, employee_id = e.id, shift_in_day_id = shift_in_day.id });
+                            currentAssigning.Add(new AssigningEntity
+                            {
+                                department_id
+                                = dep.id,
+                                employee_id = e.id,
+                                shift_in_day_id = shift_in_day.id
+                            });
                             UpdateShiftApproved(true, e.id, shift_in_day.id);
                         }
                     }
@@ -170,7 +181,12 @@ namespace BL
                 ConnectDB.entity.Assigning.Add(AssigningEntity.ConvertEntityToDB(item));//עדכון טבלת שיבוץ סופי
                 RatingBL.SetStatus();//עדכון טבלת שביעות רצון
             }
+
             ConnectDB.entity.SaveChanges();
+            //אתחול טבלת דרוגים
+            clearRating(business_id);
+           //עדכון תאריכי פתיחת יומן וסגירת ימן
+            updatedicdate(business_id);
             return GetAssigning(business_id);
         }
 
@@ -197,5 +213,36 @@ namespace BL
 
             return dic_suitable;
         }
+
+        //אתחול/מחיקה טבלת דרוגים
+        public static void clearRating(int business_id)
+        {
+            var Employees_in_business = ConnectDB.entity.Employees.Where(e => e.Business_Id == business_id);
+            var rating = ConnectDB.entity.Rating.Where(b => Employees_in_business.Contains(b.Employees));
+            ConnectDB.entity.Rating.RemoveRange(rating);
+            ConnectDB.entity.SaveChanges();
+        }
+
+        //אתחול/מחיקה טבלת שיבוץ
+        public static void clearAssigning(int business_id)
+        {
+            var Employees_in_business = ConnectDB.entity.Employees.Where(e => e.Business_Id == business_id).Select(s=>s.ID);
+            var assigning=  ConnectDB.entity.Assigning.Where(a => Employees_in_business.Contains(a.Employee_ID));
+            ConnectDB.entity.Assigning.RemoveRange(assigning);
+            ConnectDB.entity.SaveChanges();
+        }
+
+        //עדכון פתיחת יומן וסגירת יומן
+        public static void updatedicdate( int business_id)
+        {
+            var departments = ConnectDB.entity.Business.FirstOrDefault(b => b.ID == business_id).Departments;
+            //הפרש הימים
+            double days = (departments.First ().Diary_Closing_Day - departments.First().Diary_Opening_Day).TotalDays;
+            departments.ToList().ForEach(d => { d.Diary_Opening_Day = d.Diary_Opening_Day.AddDays(days); d.Diary_Closing_Day = d.Diary_Closing_Day.AddDays(days); });
+            ConnectDB.entity.SaveChanges();
+
+        }
+
+
     }
 }

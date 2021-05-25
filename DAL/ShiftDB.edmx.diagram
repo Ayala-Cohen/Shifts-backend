@@ -4,11 +4,11 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="c625c487f310422e9f73901a935715d0" Name="Diagram1">
+      <Diagram DiagramId="c625c487f310422e9f73901a935715d0" Name="Diagram1" ZoomLevel="72">
         <EntityTypeShape EntityType="ShiftsModel.Assigning" Width="1.5" PointX="7.5" PointY="11" IsExpanded="true" />
         <EntityTypeShape EntityType="ShiftsModel.Business" Width="1.5" PointX="0.75" PointY="10.375" IsExpanded="true" />
         <EntityTypeShape EntityType="ShiftsModel.Constraints" Width="1.5" PointX="10.5" PointY="11.625" IsExpanded="true" />
-        <EntityTypeShape EntityType="ShiftsModel.Departments" Width="1.5" PointX="3" PointY="7.5" IsExpanded="true" />
+        <EntityTypeShape EntityType="ShiftsModel.Departments" Width="1.5" PointX="3" PointY="7.75" IsExpanded="true" />
         <EntityTypeShape EntityType="ShiftsModel.Employee_Roles" Width="1.5" PointX="3" PointY="11" IsExpanded="true" />
         <EntityTypeShape EntityType="ShiftsModel.Employees" Width="1.5" PointX="5.25" PointY="8.75" IsExpanded="true" />
         <EntityTypeShape EntityType="ShiftsModel.Rating" Width="1.5" PointX="10.5" PointY="14.375" IsExpanded="true" />
