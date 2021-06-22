@@ -64,7 +64,7 @@ namespace BL
             {
             if (sendUpdateNeeded(b.ID))
                 {
-                    EmployeesBL.SendEmailOfQuestion(b.Employees.ToList(), "תזכורת למילוי שיבוץ", "חינחנחינ");
+                    EmployeesBL.SendEmail(b.Employees.ToList(), "תזכורת למילוי שיבוץ", "מחר נסגרת האפשרות לדרג משמרות, אם עדיין לא דרגת את כל המשמרות גש לבצע זאת לפני שהיומן יסגר");
                 }
             }
         });

@@ -516,7 +516,7 @@ namespace BL
 
         //פונקציה לשליחת אמייל , הפונקציה מקבלת את הנושא ואת המסר לשליחה
         //שיניתי שיקבל מסוג עובדEmployees ולא EmployeesEntity  
-        public static void SendEmailOfQuestion(List<Employees> l, string subject, string message)
+        public static void SendEmail(List<Employees> l, string subject, string message)
         {
             try
             {
