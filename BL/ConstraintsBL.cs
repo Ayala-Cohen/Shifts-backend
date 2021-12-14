@@ -14,107 +14,32 @@ namespace BL
         //פונקציה לשליפת אילוץ בודד על פי קוד
         public static ConstraintsEntity GetConstraintById(int s_id, string e_id)
         {
-            try
-            {
-                ConstraintsEntity c = ConstraintsEntity.ConvertDBToEntity(ConnectDB.entity.Constraints.First(x => x.Shift_ID == s_id && x.Employee_Id == e_id));
-                return c;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
+            return ConstraintsEntity.ConvertDBToEntity(ConstraintsDal.GetConstraintById(s_id, e_id));
         }
         //פונקציה לשליפת רשימת אילוצים של עובד מסוים
         public static List<ConstraintsEntity> GetAllConstraint(string employee_id)
         {
-            try
-            {
-                List<ConstraintsEntity> l_constraints = ConstraintsEntity.ConvertListDBToListEntity(ConnectDB.entity.Constraints.Where(x => x.Employee_Id == employee_id).ToList());
-                return l_constraints;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                return null;
-            }
-
+            return ConstraintsEntity.ConvertListDBToListEntity(ConstraintsDal.GetAllConstraint(employee_id));
         }
 
-        public static Dictionary<int, Dictionary<int, int>> GetNumberOfConstraintsPerShift(int business_id)
-        {
-            Dictionary<int, int> dic_shifts;
-            Dictionary<int, Dictionary<int, int>> dic_roles = new Dictionary<int, Dictionary<int, int>>();
-            try
-            {
-                var roles = Employees_RoleBL.GetAllEmployeesRoles(business_id);
-                var constraints_db = ConnectDB.entity.Constraints.Where(x => ConnectDB.entity.Shifts.Any(y => y.Business_Id == business_id));
-                foreach (var role in roles)
-                {
-                    dic_shifts = new Dictionary<int, int>();
-                    var filtered = constraints_db.Where(x => ConnectDB.entity.Employees.FirstOrDefault(y => y.ID == x.Employee_Id).Role_Id == role.id);//רשימת האילוצים של העובדים בתפקיד הנוכחי
-                    var constraints_db_grouped = filtered.GroupBy(x => new { x.Shift_ID, x.Day });
-                    foreach (var item in constraints_db_grouped)
-                    {
-                        var shift_in_day_id = ShiftsBL.GetShiftInDayId(item.Key.Shift_ID, item.Key.Day);
-                        dic_shifts.Add(shift_in_day_id, item.Count());
-                    }
-                    dic_roles.Add(role.id, dic_shifts);
-                }
-                return dic_roles;
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                return null;
-            }
-        }
 
         //פונקציה למחיקת אילוץ
         public static List<ConstraintsEntity> DeleteConstraint(int s_id, string day, string e_id)
         {
-            try
-            {
-                Constraints c_for_deleting = ConnectDB.entity.Constraints.First(x => x.Shift_ID == s_id && x.Employee_Id == e_id && x.Day == day);
-                ConnectDB.entity.Constraints.Remove(c_for_deleting);
-                ConnectDB.entity.SaveChanges();
-                return GetAllConstraint(e_id);
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                return null;
-            }
-
+            return ConstraintsEntity.ConvertListDBToListEntity(ConstraintsDal.DeleteConstraint(s_id, day, e_id));
         }
         //פונקציה לעדכון אילוץ
         public static List<ConstraintsEntity> UpdateConstraint(ConstraintsEntity c)
         {
-            try
-            {
-                Constraints c_for_updating = ConnectDB.entity.Constraints.First(x => x.Shift_ID == c.shift_id && x.Employee_Id == c.employee_id);
-                c_for_updating.Day = c.day;
-                ConnectDB.entity.SaveChanges();
-                return GetAllConstraint(c.employee_id);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-
+            var c_db = ConstraintsEntity.ConvertEntityToDB(c);
+            return ConstraintsEntity.ConvertListDBToListEntity(ConstraintsDal.UpdateConstraint(c_db));
         }
 
         //פונקציה להוספת אילוץ
         public static List<ConstraintsEntity> AddConstraint(ConstraintsEntity c)
         {
-            try
-            {
-                ConnectDB.entity.Constraints.Add(ConstraintsEntity.ConvertEntityToDB(c));
-                ConnectDB.entity.SaveChanges();
-            }
-            catch
-            { }
-            return GetAllConstraint(c.employee_id);
+            var c_db = ConstraintsEntity.ConvertEntityToDB(c);
+            return ConstraintsEntity.ConvertListDBToListEntity(ConstraintsDal.AddConstraint(c_db));
         }
 
         //חישוב המספר להגבלת אילוצים קבועים על מנת שלא יווצר מצב שכל העובדים חסמו את אותה המשמרת באילוץ קבוע
@@ -148,5 +73,35 @@ namespace BL
                 return -1;
             }
         }
+
+        public static Dictionary<int, Dictionary<int, int>> GetNumberOfConstraintsPerShift(int business_id)
+        {
+            Dictionary<int, int> dic_shifts;
+            Dictionary<int, Dictionary<int, int>> dic_roles = new Dictionary<int, Dictionary<int, int>>();
+            try
+            {
+                var roles = Employees_RoleBL.GetAllEmployeesRoles(business_id);
+                var constraints_db = ConnectDB.entity.Constraints.Where(x => ConnectDB.entity.Shifts.Any(y => y.Business_Id == business_id));
+                foreach (var role in roles)
+                {
+                    dic_shifts = new Dictionary<int, int>();
+                    var filtered = constraints_db.Where(x => ConnectDB.entity.Employees.FirstOrDefault(y => y.ID == x.Employee_Id).Role_Id == role.id);//רשימת האילוצים של העובדים בתפקיד הנוכחי
+                    var constraints_db_grouped = filtered.GroupBy(x => new { x.Shift_ID, x.Day });
+                    foreach (var item in constraints_db_grouped)
+                    {
+                        var shift_in_day_id = ShiftsBL.GetShiftInDayId(item.Key.Shift_ID, item.Key.Day);
+                        dic_shifts.Add(shift_in_day_id, item.Count());
+                    }
+                    dic_roles.Add(role.id, dic_shifts);
+                }
+                return dic_roles;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+                return null;
+            }
+        }
+
     }
 }

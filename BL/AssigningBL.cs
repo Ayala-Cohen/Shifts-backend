@@ -14,29 +14,13 @@ namespace BL
 
         public static Dictionary<string, Dictionary<int, int>> dic_of_satisfaction;
         public static List<AssigningEntity> currentAssigning = new List<AssigningEntity>();
-        public static Dictionary<int, Dictionary<string, IGrouping<string, Rating>>> dic_shift_rating = new Dictionary<int, Dictionary<string, IGrouping<string, Rating>>>();//מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
+        public static Dictionary<int, Dictionary<string, IGrouping<string, RatingEntity>>> dic_shift_rating = new Dictionary<int, Dictionary<string, IGrouping<string, RatingEntity>>>();//מילון המכיל כמפתח קוד משמרת וכערך מילון שמכיל את רשימת הדירוגים מקובצת לפי דירוג
 
 
         //פונקציה לשליפת שיבוץ סופי
         public static List<AssigningEntity> GetAssigning(int business_id)
         {
-            try
-            {
-                List<Departments> departments = ConnectDB.entity.Departments.Where(x => x.Business_Id == business_id).ToList();
-                List<Employees> employees = ConnectDB.entity.Employees.Where(x => x.Business_Id == business_id).ToList();
-                List<Shifts> shifts = ConnectDB.entity.Shifts.Where(x => x.Business_Id == business_id).ToList();
-                List<Shifts_In_Days> shifts_In_Days = ConnectDB.entity.Shifts_In_Days.ToList();
-                shifts_In_Days = shifts_In_Days.Where(x => shifts.Any(y => y.ID == x.Shift_ID)).ToList();
-                List<Assigning> l = ConnectDB.entity.Assigning.ToList();
-                l = l.Where(x => departments.Any(y => y.ID == x.Department_ID) && employees.Any(y => y.ID == x.Employee_ID) && shifts_In_Days.Any(y => y.ID == x.Shift_In_Day_ID)).ToList();
-                return (AssigningEntity.ConvertListDBToListEntity(l));
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                return null;
-            }
-
+            return AssigningEntity.ConvertListDBToListEntity(AssigningDal.GetAssigning(business_id));
         }
         //יצירת מילון שיכיל כמפתח קוד משמרת ולכל משמרת יישמר מילון של הדירוגים מקובץ לפי דירוג
         public static void CreateDicShifts(int business_id)
@@ -48,11 +32,11 @@ namespace BL
                     var shifts_in_day = ShiftsBL.GetAllShiftsForDay(business_id);
                     if (shifts_in_day != null)
                     {
-                        var grouped_by_shift = ConnectDB.entity.Rating.ToList().Where(x => shifts_in_day.Any(y => y.id == x.Shift_In_Day)).GroupBy(x => x.Shift_In_Day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
+                        var grouped_by_shift = RatingBL.GetAllRatings().Where(x => shifts_in_day.Any(y => y.id == x.shift_in_day)).GroupBy(x => x.shift_in_day).ToDictionary(x => x.Key);//רשימת הדירוגים מקובצת לפי משמרות
                                                                                                                                                                                                  //יצירת מילון שיכיל כמפתח קוד משמרת ולכל משמרת יישמר מילון של הדירוג
                         foreach (var item in grouped_by_shift)
                         {
-                            var grouped_by_rating = item.Value.GroupBy(x => x.Rating1).ToDictionary(x => x.Key);
+                            var grouped_by_rating = item.Value.GroupBy(x => x.rating).ToDictionary(x => x.Key);
                             dic_shift_rating.Add(item.Key, grouped_by_rating);
                         }
                     }
@@ -67,8 +51,8 @@ namespace BL
         //פונקציה לעדכון האם משמרת התקבלה או לא
         public static void UpdateShiftApproved(bool status, string employee_id, int shift_id)
         {
-            var r = ConnectDB.entity.Rating.FirstOrDefault(x => x.Employee_ID == employee_id && shift_id == x.Shift_In_Day);
-            r.Shift_Approved = status;
+            var r = RatingBL.GetRatingById(employee_id, shift_id);
+            r.shift_approved = status;
             ConnectDB.entity.SaveChanges();
         }
         //פונקציית שיבוץ
@@ -115,7 +99,7 @@ namespace BL
                                 var dic_rating_can_prefere = dic_shift_rating[shift_in_day.id].Where(y => y.Key == "יכול" || y.Key == "מעדיף");//שליפת הדירוגים מעדיף ויכול למשמרת זו
                                 foreach (var a in currentAssigning.ToList())//מעבר על השיבוץ המקומי על מנת לבדוק האם ישנו עובד שאם נזיז אותו למשמרת אחרת נצליח לשבץ את מספר העובדים הנדרש
                                 {
-                                    var l_assigned_with_high_rating = dic_rating_can_prefere.Where(x => x.Value.Any(y => y.Employee_ID == a.employee_id) && !l_employees.Any(y => y.id == a.employee_id));//שליפת הדירוגים של העובד שעליו אנו מבצעים את הבדיקה בתנאי שהוא לא מועמד מלכתחילה לשיבוץ במשמרת זו
+                                    var l_assigned_with_high_rating = dic_rating_can_prefere.Where(x => x.Value.Any(y => y.employee_id == a.employee_id) && !l_employees.Any(y => y.id == a.employee_id));//שליפת הדירוגים של העובד שעליו אנו מבצעים את הבדיקה בתנאי שהוא לא מועמד מלכתחילה לשיבוץ במשמרת זו
                                     l_assigned_with_high_rating = l_assigned_with_high_rating.Where(x => EmployeesBL.GetEmployeeById(a.employee_id).role_id == role.role_id);//הגבלה לשורה הקודמת - רק אם העובד מאותו התפקיד שאנו מנסים לשבץ כרגע
                                     if (l_assigned_with_high_rating.Count() != 0)// בדיקה שאכן לעובד הנוכחי היה דירוג גבוה למשמרת זו
                                     {
@@ -201,7 +185,7 @@ namespace BL
             ConnectDB.entity.SaveChanges();
             //אתחול טבלת דרוגים
             clearRating(business_id);
-           //עדכון תאריכי פתיחת יומן וסגירת ימן
+            //עדכון תאריכי פתיחת יומן וסגירת ימן
             updatedicdate(business_id);
             return GetAssigning(business_id);
         }
@@ -288,18 +272,18 @@ namespace BL
         //אתחול/מחיקה טבלת שיבוץ
         public static void clearAssigning(int business_id)
         {
-            var Employees_in_business = ConnectDB.entity.Employees.Where(e => e.Business_Id == business_id).Select(s=>s.ID);
-            var assigning=  ConnectDB.entity.Assigning.Where(a => Employees_in_business.Contains(a.Employee_ID));
+            var Employees_in_business = ConnectDB.entity.Employees.Where(e => e.Business_Id == business_id).Select(s => s.ID);
+            var assigning = ConnectDB.entity.Assigning.Where(a => Employees_in_business.Contains(a.Employee_ID));
             ConnectDB.entity.Assigning.RemoveRange(assigning);
             ConnectDB.entity.SaveChanges();
         }
 
         //עדכון פתיחת יומן וסגירת יומן
-        public static void updatedicdate( int business_id)
+        public static void updatedicdate(int business_id)
         {
             var departments = ConnectDB.entity.Business.FirstOrDefault(b => b.ID == business_id).Departments;
             //הפרש הימים
-            double days = (departments.First ().Diary_Closing_Day - departments.First().Diary_Opening_Day).TotalDays;
+            double days = (departments.First().Diary_Closing_Day - departments.First().Diary_Opening_Day).TotalDays;
             departments.ToList().ForEach(d => { d.Diary_Opening_Day = d.Diary_Opening_Day.AddDays(days); d.Diary_Closing_Day = d.Diary_Closing_Day.AddDays(days); });
             ConnectDB.entity.SaveChanges();
 

@@ -53,19 +53,25 @@
     <Compile Include="Assigning.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="AssigningDal.cs" />
     <Compile Include="Business.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="BusinessDal.cs" />
     <Compile Include="ConnectDB.cs" />
     <Compile Include="Constraints.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="ConstraintsDal.cs" />
     <Compile Include="Departments.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="DepartmentsDal.cs" />
+    <Compile Include="EmployeeDal.cs" />
     <Compile Include="Employees.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="Employees_RolesDal.cs" />
     <Compile Include="Employee_Roles.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
@@ -76,6 +82,7 @@
     <Compile Include="Rating.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="RatingDal.cs" />
     <Compile Include="Satisfaction_Status.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
@@ -97,6 +104,8 @@
     <Compile Include="Shifts.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>
+    <Compile Include="ShiftsDal.cs" />
+    <Compile Include="Shifts_EmployeesDal.cs" />
     <Compile Include="Shifts_In_Days.cs">
       <DependentUpon>ShiftDB.tt</DependentUpon>
     </Compile>

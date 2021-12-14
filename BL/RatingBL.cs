@@ -14,87 +14,37 @@ namespace BL
         //פונקציה לשליפת דירוג בודד על פי קוד
         public static RatingEntity GetRatingById(string e_id, int s_in_day)
         {
-            try
-            {
-                RatingEntity r = RatingEntity.ConvertDBToEntity(ConnectDB.entity.Rating.First(x => x.Employee_ID == e_id && x.Shift_In_Day == s_in_day));
-                return r;
-            }
-            catch
-            {
-                return null;
-            }
-
+            return RatingEntity.ConvertDBToEntity(RatingDal.GetRatingById(e_id, s_in_day));
         }
         //פונקציה לשליפת רשימת דירוגים של עובד מסוים
-        public static List<RatingEntity> GetAllRating(string employee_id)
+        public static List<RatingEntity> GetAllRatingOfEmployee(string employee_id)
         {
-            try
-            {
-                var l_rating_db = ConnectDB.entity.Rating.Where(x => x.Employee_ID == employee_id).ToList();
-                List<RatingEntity> l_rating = new List<RatingEntity>();
-                if (l_rating_db.Count() != 0)
-                    l_rating = RatingEntity.ConvertListDBToListEntity(l_rating_db).ToList();
-                return l_rating;
-            }
-            catch
-            {
-                return null;
-            }
-
+            return RatingEntity.ConvertListDBToListEntity(RatingDal.GetAllRatingOfEmployee(employee_id));
+        }
+        //פונקציה לשליפת כל הדירוגים
+        public static List<RatingEntity> GetAllRatings()
+        {
+            return RatingEntity.ConvertListDBToListEntity(RatingDal.GetAllRatings());
         }
 
         //פונקציה למחיקת דירוג
         public static List<RatingEntity> DeleteRating(string e_id, int s_in_day)
         {
-            try
-            {
-                Rating rating_for_deleting = ConnectDB.entity.Rating.First(x => x.Employee_ID == e_id && x.Shift_In_Day == s_in_day);
-                ConnectDB.entity.Rating.Remove(rating_for_deleting);
-                ConnectDB.entity.SaveChanges();
-                return GetAllRating(e_id);
-            }
-            catch
-            {
-                return null;
-            }
+            return RatingEntity.ConvertListDBToListEntity(RatingDal.DeleteRating(e_id, s_in_day));
         }
         //פונקציה לעדכון דירוג
         public static List<RatingEntity> UpdateRating(RatingEntity r)
         {
-            try
-            {
-                Rating rating_for_updating = ConnectDB.entity.Rating.First(x => x.Employee_ID == r.employee_id);
-                rating_for_updating.Shift_Id = r.shift_id;
-                rating_for_updating.Shift_Approved = r.shift_approved;
-                rating_for_updating.Rating1 = r.rating;
-                ConnectDB.entity.SaveChanges();
-                return GetAllRating(r.employee_id);
-            }
-            catch
-            {
-                return null;
-            }
+            var r_db = RatingEntity.ConvertEntityToDB(r);
+            return RatingEntity.ConvertListDBToListEntity(RatingDal.UpdateRating(r_db));
         }
 
 
         //פונקציה להוספת דירוג
         public static List<RatingEntity> AddRating(RatingEntity r, string day)
         {
-            try
-            {
-                int s_in_day_id = ConnectDB.entity.Shifts_In_Days.FirstOrDefault(x => x.Day == day && x.Shift_ID == r.shift_id).ID;
-                r.shift_in_day = s_in_day_id;
-                Rating r_db = RatingEntity.ConvertEntityToDB(r);
-                ConnectDB.entity.Rating.Add(r_db);
-                ConnectDB.entity.SaveChanges();
-                return GetAllRating(r.employee_id);
-
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e);
-                return null;
-            }
+            var r_db = RatingEntity.ConvertEntityToDB(r);
+            return RatingEntity.ConvertListDBToListEntity(RatingDal.AddRating(r_db, day));
         }
 
         //פונקציה לקביעת דירוג סטטיטי עבור עובד
@@ -155,17 +105,17 @@ namespace BL
                     {
                         if (rating_level.Key == "מעדיף" || rating_level.Key == "יכול")
                         {
-                            if (rating.Shift_Approved == true)
-                                AssigningBL.dic_of_satisfaction[rating.Employee_ID][1]++;
+                            if (rating.shift_approved == true)
+                                AssigningBL.dic_of_satisfaction[rating.employee_id][1]++;
                             else
-                                AssigningBL.dic_of_satisfaction[rating.Employee_ID][4]++;
+                                AssigningBL.dic_of_satisfaction[rating.employee_id][4]++;
                         }
                         else
                         {
-                            if (rating.Shift_Approved == true)
-                                AssigningBL.dic_of_satisfaction[rating.Employee_ID][4]++;
+                            if (rating.shift_approved == true)
+                                AssigningBL.dic_of_satisfaction[rating.employee_id][4]++;
                             else
-                                AssigningBL.dic_of_satisfaction[rating.Employee_ID][1]++;
+                                AssigningBL.dic_of_satisfaction[rating.employee_id][1]++;
                         }
                     }
                 }
