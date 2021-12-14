@@ -15,9 +15,9 @@ namespace ShiftsApi.Controllers
         //פונקציה להחזרת רשימת דירוגים של עובד מסוים
         [Route("GetAllRatings/{employee_id}")]
         [HttpGet]
-        public List<RatingEntity> GetAllRatings(string employee_id)
+        public List<RatingEntity> GetAllRatingsOfEmployee(string employee_id)
         {
-            return RatingBL.GetAllRating(employee_id);
+            return RatingBL.GetAllRatingOfEmployee(employee_id);
         }
 
         //פונקציה להחזרת דירוג ע"י קוד
