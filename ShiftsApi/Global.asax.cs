@@ -12,7 +12,7 @@ namespace ShiftsApi
         protected void Application_Start()
         {
             GlobalConfiguration.Configure(WebApiConfig.Register);
-            BL.SchedulingSchedule.scheduleAsync();
+            BL.SchedulingSchedule.ScheduleAsync();
         }
         protected void Application_BeginRequest()
         {

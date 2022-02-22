@@ -3,6 +3,7 @@ using Quartz;
 using Quartz.Impl;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace BL
 
         }
 
-        public static async Task scheduleAsync()
+        public static async Task ScheduleAsync()
         {
 
             // Grab the Scheduler instance from the Factory
@@ -37,7 +38,7 @@ namespace BL
             ITrigger trigger = TriggerBuilder.Create()
                 .WithIdentity("trigger1", "group1")
 .WithSchedule(CronScheduleBuilder
-    .DailyAtHourAndMinute(14, 39))
+    .DailyAtHourAndMinute(13, 44))
 .Build();
 
 
@@ -58,21 +59,21 @@ namespace BL
         {
             ConnectDB.entity.Business.ToList().ForEach(b =>
         {
-            if (newAssigningNeeded(b.ID))
+            if (NewAssigningNeeded(b.ID))
                 AssigningBL.AssigningActivity(b.ID);
             else
             {
-            if (sendUpdateNeeded(b.ID))
+                if (SendUpdateNeeded(b.ID))
                 {
-                    EmployeesBL.SendEmail(b.Employees.ToList(), "תזכורת למילוי שיבוץ", "מחר נסגרת האפשרות לדרג משמרות, אם עדיין לא דרגת את כל המשמרות גש לבצע זאת לפני שהיומן יסגר");
+                    EmployeesBL.SendEmailToEmployees(b.Employees.ToList(), "תזכורת למילוי שיבוץ", "מחר נסגרת האפשרות לדרג משמרות, אם עדיין לא דרגת את כל המשמרות גש לבצע זאת לפני שהיומן יסגר");
                 }
             }
         });
-
+            Debug.WriteLine("Hi I am a asynchronize job!!!");
         }
 
 
-        public bool newAssigningNeeded(int code)
+        public bool NewAssigningNeeded(int code)
         {
             var department = ConnectDB.entity.Departments.FirstOrDefault(d => d.Business_Id == code);
             if (department == null)
@@ -91,7 +92,7 @@ namespace BL
             return days == daysFromLastAssigning;
         }
 
-        public bool sendUpdateNeeded(int business_id)
+        public bool SendUpdateNeeded(int business_id)
         {
             var department = ConnectDB.entity.Departments.FirstOrDefault(d => d.Business_Id == business_id);
             if (department == null)

@@ -14,9 +14,9 @@ namespace ShiftsApi.Controllers
     {
         //פונקציה לשליפת שיבוץ סופי
         [Route("GetAssigning/{business_id}")]
-        public List<AssigningEntity> GetAssigning(int business_id)
+        public IHttpActionResult GetAssigning(int business_id)
         {
-            return AssigningBL.GetAssigning(business_id);
+            return Ok(AssigningBL.GetAssigning(business_id));
         }
 
         //פונקציה להחזרת העובדים שדירגו משמרת מסוימת בדירוג גבוה על מנת לערוך את השיבוץ
@@ -33,7 +33,7 @@ namespace ShiftsApi.Controllers
         public List<AssigningEntity> ActivateAssigning(int business_id)
         {
             AssigningBL.AssigningActivity(business_id);
-            return GetAssigning(business_id);
+            return (List<AssigningEntity>)GetAssigning(business_id);
         }
 
         //פונקציה לעריכת שיבוץ

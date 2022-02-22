@@ -283,13 +283,13 @@ namespace BL
         //    }
         //    return d;
         //}
-        //פונקציה לבדיקה האם עובד משובץ בכל המשמרות שעליו לבצע
-        public static bool CheckIfAssignedInAllShifts(string id)
-        {
 
+        //פונקציה לבדיקה האם עובד משובץ בכל המשמרות שעליו לבצע
+        public static bool IsAssignedInAllShifts(string id)
+        {
             EmployeesEntity e = GetEmployeeById(id);
             int num_for_performing = Employees_RoleBL.GetEmployeeRoleById(e.role_id).min_of_shift;
-            int num_assigned = AssigningBL.currentAssigning.Where(x => x.employee_id == id).Count();//שליפת מספר הפעמים בהם משובץ העובד
+            int num_assigned = AssigningBL.localAssigning.Where(x => x.employee_id == id).Count();//שליפת מספר הפעמים בהם משובץ העובד
             return num_assigned == num_for_performing;
         }
         //פונקציית עזר - יצירת מילון עבור דירוג סטטיסטי
@@ -297,7 +297,7 @@ namespace BL
         {
             try
             {
-                Dictionary<string, Dictionary<int, int>> d = new Dictionary<string, Dictionary<int, int>>();
+                Dictionary<string, Dictionary<int, int>> dicSatisfactionOfEmployee = new Dictionary<string, Dictionary<int, int>>();
                 Dictionary<int, int> dic;
                 //if (ConnectDB.entity.Satisfaction_Status.Count() != 0)
                 //{
@@ -318,10 +318,10 @@ namespace BL
                                 dic[status.Key] = grouped_list[employee.id].Count(x => x.Satisfaction_Status1 == status.Key);//הוספת ערכים למילון השכיחויות  
                             }
                         }
-                        d.Add(employee.id, dic); //הוספת ערכים למילון הראשי
+                        dicSatisfactionOfEmployee.Add(employee.id, dic); //הוספת ערכים למילון הראשי
                     }
                 //}
-                return d;
+                return dicSatisfactionOfEmployee;
             }
             catch
             {
@@ -394,7 +394,7 @@ namespace BL
                                                                                                                         //בדיקה האם לעובד זה יש אילוץ קבוע במשמרת זו
                                 is_has_constaint = ConnectDB.entity.Constraints.FirstOrDefault(x => x.Shift_ID == shift_id && day == x.Day && x.Employee_Id == id) != null;
                                 //עדיין לא שובץ בכל המשמרות שעליו לבצע ואין לו אילוץ קבוע במשמרת זו וכן שהוא לא משובץ כבר במשמרת זו 
-                                if (!CheckIfAssignedInAllShifts(id) && !is_has_constaint && !CheckIfAssignedInShift(shift_in_day_id, id))
+                                if (!IsAssignedInAllShifts(id) && !is_has_constaint && !CheckIfAssignedInShift(shift_in_day_id, id))
                                 {
                                     l.Add(EmployeesEntity.ConvertDBToEntity(ConnectDB.entity.Employees.FirstOrDefault(x => x.ID == id)));//הוספה לרשימה הסופית של העובדים האופטימליים
                                     if (l.Count() == min_for_perfoming)//כאשר נמצאו מספר עובדים מתאימים לפי מספר העובדים הנדרשים למשמרת זו מאותו התפקיד
@@ -417,7 +417,7 @@ namespace BL
         //פונקציה לבדיקה האם עובד משובץ כבר במשמרת מסוימת
         public static bool CheckIfAssignedInShift(int shift_in_day_id, string employee_id)
         {
-            return AssigningBL.currentAssigning.Any(x => x.employee_id == employee_id && x.shift_in_day_id == shift_in_day_id);
+            return AssigningBL.localAssigning.Any(x => x.employee_id == employee_id && x.shift_in_day_id == shift_in_day_id);
         }
         //פונקציה להשלמת דירוגים אם לעובד אין דירוג על כל המשמרות הפעילות בעסק
         public static void CompleteRatingOfAllShifts(string employee_id)
@@ -447,9 +447,8 @@ namespace BL
         }
 
 
-        //פונקציה לשליחת אמייל , הפונקציה מקבלת את הנושא ואת המסר לשליחה
-        //שיניתי שיקבל מסוג עובדEmployees ולא EmployeesEntity  
-        public static void SendEmail(List<Employees> l, string subject, string message)
+        //פונקציה לשליחת אמייל , הפונקציה מקבלת את הנושא ואת גוף ההודעה לשליחה
+        public static void SendEmailToEmployees(List<Employees> l, string subject, string message)
         {
             try
             {

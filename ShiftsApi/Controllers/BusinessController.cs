@@ -18,17 +18,17 @@ namespace ShiftsApi.Controllers
         //פונקציה להחזרת רשימת העסקים
         [Route("GetAllBusinesses")]
         [HttpGet]
-        public List<BusinessEntity> GetAllBusinesses()
+        public IHttpActionResult GetAllBusinesses()
         {
-            return BusinessBL.GetAllBusinesses();
+            return Ok(BusinessBL.GetAllBusinesses());
         }
 
         //פונקציה להחזרת עסק ע"י קוד
         [Route("GetBusinessById/{id}")]
         [HttpGet]
-        public BusinessEntity GetBusinessById(int id)
+        public IHttpActionResult GetBusinessById(int id)
         {
-            return BusinessBL.GetBusinessById(id);
+            return Ok(BusinessBL.GetBusinessById(id));
         }
         //פונקציה למחיקת עסק
         [Route("DeleteBusiness/{id}")]
@@ -65,7 +65,7 @@ namespace ShiftsApi.Controllers
                 string name = postedFile.FileName;
                 name = name.Substring(0, name.IndexOf('.'));
                 fileName = name + business_id.ToString() + Path.GetExtension(postedFile.FileName);
-                filePath = @"D:\Ayala\FinalProject\Shifts\src\assets\images\" + fileName;
+                filePath += fileName;
                 if (!File.Exists(filePath))
                 {
                     postedFile.SaveAs(filePath);
@@ -80,23 +80,23 @@ namespace ShiftsApi.Controllers
         {
             return BusinessBL.GetBusinessBydirectorDetails(email, password);
         }
-        [Route("GetLogo/{business_id}")]
-        [HttpPost]
-        public string GetLogo(int business_id)
-        {
-            var httpRequest = HttpContext.Current.Request;
-            var postedFile = httpRequest.Files["Logo"];
-            string filePath = "";
-            if (postedFile != null)
-            {
-                string name = postedFile.FileName;
-                name = name.Substring(0, name.IndexOf('.'));
-                var fileName = name + business_id.ToString() + Path.GetExtension(postedFile.FileName);
-                filePath = HttpContext.Current.Server.MapPath(@"~/Files/images/" + fileName);
-                if (!File.Exists(filePath))
-                    postedFile.SaveAs(filePath);
-            }
-            return filePath;
-        }
+        //[Route("GetLogo/{business_id}")]
+        //[HttpPost]
+        //public string GetLogo(int business_id)
+        //{
+        //    var httpRequest = HttpContext.Current.Request;
+        //    var postedFile = httpRequest.Files["Logo"];
+        //    string filePath = "";
+        //    if (postedFile != null)
+        //    {
+        //        string name = postedFile.FileName;
+        //        name = name.Substring(0, name.IndexOf('.'));
+        //        var fileName = name + business_id.ToString() + Path.GetExtension(postedFile.FileName);
+        //        filePath = HttpContext.Current.Server.MapPath(@"~/Files/images/" + fileName);
+        //        if (!File.Exists(filePath))
+        //            postedFile.SaveAs(filePath);
+        //    }
+        //    return filePath;
+        //}
     }
 }

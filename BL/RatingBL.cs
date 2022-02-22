@@ -11,6 +11,8 @@ namespace BL
 {
     public class RatingBL
     {
+        public enum Ratings { Prefere, Can, NotPrefere, CanNot}
+        
         //פונקציה לשליפת דירוג בודד על פי קוד
         public static RatingEntity GetRatingById(string e_id, int s_in_day)
         {

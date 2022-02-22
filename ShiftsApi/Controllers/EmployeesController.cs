@@ -102,7 +102,7 @@ namespace ShiftsApi.Controllers
         public void SendSendCheckingEmailToEmployees([FromBody] List<EmployeesEntity> l_employees, string message, string subject, int num)
         {
             var l_employees_db = EmployeesEntity.ConvertListEntityToListDB(l_employees);
-            EmployeesBL.SendEmail(l_employees_db, subject, message);
+            EmployeesBL.SendEmailToEmployees(l_employees_db, subject, message);
         }
     }
 }

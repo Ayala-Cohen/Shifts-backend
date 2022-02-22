@@ -31,5 +31,10 @@ namespace DAL
             }
 
         }
+        public static void AddAssigning(Assigning assigning)
+        {
+            db.Assigning.Add(assigning);
+            db.SaveChanges();
+        }
     }
 }
